@@ -6,6 +6,7 @@
 
 body, html {
   font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -100,7 +101,8 @@ h1, h2, h3, h4, h5, h6 {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  min-width: 7rem;
+  min-width: 5rem;
+  max-width: 8rem;
   height: 2rem;
   display: flex !important;
   align-items: center !important;
