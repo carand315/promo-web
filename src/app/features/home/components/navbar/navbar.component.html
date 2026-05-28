@@ -2,21 +2,12 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
 
     <!-- Logo + Nav -->
-    <div class="flex items-center gap-2 md:gap-6">
+    <div class="flex items-center gap-6">
       <a routerLink="/" aria-label="Ir al inicio">
         <app-logo variant="light" size="md" />
       </a>
-      <!-- Link a mapa — solo mobile -->
-      <a
-        routerLink="/mapa"
-        class="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-semibold text-red-400 border border-red-500/40 bg-red-500/10 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all duration-200"
-        aria-label="Ver mapa de planes"
-      >
-        <i class="pi pi-map-marker text-sm"></i>
-        Mapa
-      </a>
 
-      <nav class="hidden md:flex items-center gap-1" aria-label="Navegación principal">
+      <nav class="hidden lg:flex items-center gap-1" aria-label="Navegación principal">
         <a
           routerLink="/"
           routerLinkActive="text-white bg-white/10"
@@ -39,7 +30,21 @@
       </nav>
     </div>
 
-    <!-- City selector -->
+    <!-- Derecha: Mapa (mobile) + City selector (desktop) -->
+    <div class="flex items-center gap-2">
+
+      <!-- Botón Mapa — solo mobile -->
+      <a
+        routerLink="/mapa"
+        class="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-red-400 border border-red-500/40 bg-red-500/10 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all duration-200"
+        aria-label="Ver mapa de planes"
+      >
+        <i class="pi pi-map-marker text-sm"></i>
+        Mapa
+      </a>
+
+      <!-- City selector — solo desktop -->
+      <div class="hidden lg:block">
     <div class="city-picker-shell" aria-label="Selector de ciudad">
       <!-- Pulsing glow ring -->
       <span class="city-picker-glow" aria-hidden="true"></span>
@@ -66,6 +71,9 @@
         panelStyleClass="city-panel"
         aria-label="Seleccionar ciudad"
       />
+    </div>
+      </div>
+
     </div>
 
   </div>

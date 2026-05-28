@@ -96,6 +96,41 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap;
 }
 
+/* p-select estilo claro — dentro del botón blanco de mobile */
+.city-select-light.p-select {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  min-width: 4rem;
+  max-width: 6.5rem;
+  height: 1.75rem;
+  display: flex !important;
+  align-items: center !important;
+
+  &:hover, &:focus, &.p-focus {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  .p-select-label {
+    color: #374151 !important;
+    font-weight: 500 !important;
+    font-size: 0.8125rem !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+  }
+
+  .p-select-dropdown {
+    color: #374151 !important;
+    width: 1.25rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
 /* Transparent p-select inside the pill */
 .city-select.p-select {
   background: transparent !important;

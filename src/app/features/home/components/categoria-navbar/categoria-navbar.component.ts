@@ -1,22 +1,26 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  computed,
   input,
   signal,
   inject,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 import { CategoriaConConteo } from '../../home.model';
 import { toSlug } from '../../utils/slug.utils';
+import { HomeStore } from '../../home.store';
 import { SidebarService } from '../../services/sidebar.service';
 import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-categoria-navbar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgTemplateOutlet, TooltipModule],
+  imports: [NgTemplateOutlet, FormsModule, SelectModule, TooltipModule],
   templateUrl: './categoria-navbar.component.html',
 })
 export class CategoriaNavbarComponent {
@@ -27,8 +31,13 @@ export class CategoriaNavbarComponent {
   categoriaActivaId = input<number | null>(null);
   totalPromos = input(0);
 
+  store = inject(HomeStore);
   sidebar = inject(SidebarService);
   drawerOpen = signal(false);
+
+  ciudadOptions = computed(() =>
+    this.store.ciudades().map((c) => ({ label: c.nombre, value: c.id }))
+  );
 
   private router = inject(Router);
 

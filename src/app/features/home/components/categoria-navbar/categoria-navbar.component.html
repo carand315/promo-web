@@ -35,8 +35,10 @@
 
 <!-- ── MÓVIL: botón trigger + drawer ── -->
 <div class="lg:hidden">
-  <!-- Botón trigger -->
-  <div class="px-4 py-3">
+  <!-- Fila: Categorías | Ciudad (mismo estilo) -->
+  <div class="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
+
+    <!-- Categorías -->
     <button
       class="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-200 shadow-sm text-sm font-medium text-gray-700"
       (click)="toggleDrawer()"
@@ -50,6 +52,26 @@
         <span class="ml-auto w-2 h-2 rounded-full bg-[#E8372C]"></span>
       }
     </button>
+
+    <!-- City selector — estilo igual a Categorías -->
+    <div class="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-xl border border-gray-200 shadow-sm">
+      <i class="pi pi-map-marker text-[#E8372C] text-sm"></i>
+      <p-select
+        [options]="ciudadOptions()"
+        [ngModel]="store.ciudadId()"
+        (ngModelChange)="store.setCiudad($event)"
+        optionLabel="label"
+        optionValue="value"
+        [size]="'small'"
+        placeholder="Ciudad"
+        [checkmark]="true"
+        scrollHeight="320px"
+        class="city-select-light"
+        panelStyleClass="city-panel"
+        aria-label="Seleccionar ciudad"
+      />
+    </div>
+
   </div>
 
   <!-- Overlay -->
