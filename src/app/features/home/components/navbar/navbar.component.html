@@ -1,0 +1,72 @@
+<nav class="sticky top-0 z-[1000] bg-[#1a0000] border-b border-white/10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+
+    <!-- Logo + Nav -->
+    <div class="flex items-center gap-6">
+      <a routerLink="/" aria-label="Ir al inicio">
+        <app-logo variant="light" size="md" />
+      </a>
+      <!-- Link a mapa — solo mobile -->
+      <a
+        routerLink="/mapa"
+        class="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-semibold text-red-400 border border-red-500/40 bg-red-500/10 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all duration-200"
+        aria-label="Ver mapa de planes"
+      >
+        <i class="pi pi-map-marker text-sm"></i>
+        Mapa
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1" aria-label="Navegación principal">
+        <a
+          routerLink="/"
+          routerLinkActive="text-white bg-white/10"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+          aria-label="Ir a inicio"
+        >
+          <i class="pi pi-home text-xs"></i>
+          Inicio
+        </a>
+        <a
+          routerLink="/mapa"
+          routerLinkActive="!bg-red-600 !text-white shadow-lg shadow-red-900/50"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-red-400 border border-red-500/40 bg-red-500/10 hover:bg-red-600 hover:text-white hover:border-red-600 hover:shadow-lg hover:shadow-red-900/50 transition-all duration-200"
+          aria-label="Ver mapa de planes"
+        >
+          <i class="pi pi-map-marker text-sm"></i>
+          Mapa de Planes
+        </a>
+      </nav>
+    </div>
+
+    <!-- City selector -->
+    <div class="city-picker-shell" aria-label="Selector de ciudad">
+      <!-- Pulsing glow ring -->
+      <span class="city-picker-glow" aria-hidden="true"></span>
+
+      <!-- Pin icon -->
+      <span class="city-picker-icon" aria-hidden="true">
+        <i class="pi pi-map-marker"></i>
+      </span>
+
+      <!-- Label -->
+      <span class="city-picker-label hidden sm:block">Planes en</span>
+
+      <!-- Select -->
+      <p-select
+        [options]="ciudadOptions()"
+        [ngModel]="store.ciudadId()"
+        (ngModelChange)="store.setCiudad($event)"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Tu ciudad"
+        [checkmark]="true"
+        scrollHeight="320px"
+        class="city-select"
+        panelStyleClass="city-panel"
+        aria-label="Seleccionar ciudad"
+      />
+    </div>
+
+  </div>
+</nav>

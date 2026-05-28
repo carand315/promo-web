@@ -1,0 +1,416 @@
+<p-drawer
+  [(visible)]="visible"
+  position="right"
+  styleClass="!w-full md:!w-[560px]"
+  [modal]="true"
+  [closeOnEscape]="true"
+  (onHide)="cerrar()"
+  [header]="promocion() ? 'Editar plan' : 'Nuevo plan'"
+>
+  <form [formGroup]="form" (ngSubmit)="guardar()" class="flex flex-col gap-6 pb-24">
+
+    <!-- SECCIÓN: Información básica -->
+    <section>
+      <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+        Información básica
+      </h3>
+
+      <!-- Título -->
+      <div class="flex flex-col gap-1 mb-4">
+        <label for="titulo" class="text-sm font-medium text-gray-700">Título *</label>
+        <input
+          pInputText
+          id="titulo"
+          formControlName="titulo"
+          placeholder="Ej: 30% en toda la tienda"
+          [class.ng-invalid]="hasError('titulo', 'required')"
+          aria-describedby="titulo-error"
+        />
+        @if (hasError('titulo', 'required')) {
+          <small id="titulo-error" class="text-red-500">El título es requerido</small>
+        }
+      </div>
+
+      <!-- Marca -->
+      <div class="flex flex-col gap-1 mb-4">
+        <label for="marca" class="text-sm font-medium text-gray-700">Marca *</label>
+        <input
+          pInputText
+          id="marca"
+          formControlName="marca"
+          placeholder="Ej: Nike, Adidas..."
+          [class.ng-invalid]="hasError('marca', 'required')"
+        />
+        @if (hasError('marca', 'required')) {
+          <small class="text-red-500">La marca es requerida</small>
+        }
+      </div>
+
+      <!-- Categoría -->
+      <div class="flex flex-col gap-1 mb-4">
+        <label for="categoriaId" class="text-sm font-medium text-gray-700">Categoría *</label>
+        <p-select
+          inputId="categoriaId"
+          formControlName="categoriaId"
+          [options]="categorias()"
+          optionLabel="nombre"
+          optionValue="id"
+          placeholder="Seleccionar categoría"
+          styleClass="w-full"
+        />
+        @if (hasError('categoriaId', 'required')) {
+          <small class="text-red-500">La categoría es requerida</small>
+        }
+      </div>
+
+      <!-- Descripción -->
+      <div class="flex flex-col gap-1 mb-4">
+        <label for="descripcion" class="text-sm font-medium text-gray-700">Descripción</label>
+        <textarea
+          pTextarea
+          id="descripcion"
+          formControlName="descripcion"
+          rows="3"
+          placeholder="Describe el plan..."
+          style="resize: none"
+        ></textarea>
+      </div>
+
+      <!-- Descuento + Destacada -->
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-gray-700">
+            Descuento:
+            @if (form.get('descuento')?.value > 0) {
+              <span class="text-red-600 font-semibold">{{ form.get('descuento')?.value }}%</span>
+            } @else {
+              <span class="text-gray-400 font-medium">Sin descuento</span>
+            }
+          </label>
+          <p-slider
+            formControlName="descuento"
+            [min]="0"
+            [max]="100"
+            styleClass="w-full mt-2"
+          />
+        </div>
+        <div class="flex items-center gap-2 pt-5">
+          <p-checkbox
+            inputId="destacada"
+            formControlName="destacada"
+            [binary]="true"
+          />
+          <label for="destacada" class="text-sm text-gray-700">Destacada</label>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN: Apariencia visual -->
+    <section>
+      <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+        Apariencia visual
+      </h3>
+
+      <!-- Color de marca -->
+      <div class="mb-4">
+        <label class="text-sm font-medium text-gray-700 block mb-2">Color de marca</label>
+        <div class="flex gap-2 flex-wrap">
+          @for (color of coloresMarca; track color) {
+            <button
+              type="button"
+              class="w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-400"
+              [style.background-color]="color"
+              [class.border-gray-900]="form.get('colorMarca')?.value === color"
+              [class.border-transparent]="form.get('colorMarca')?.value !== color"
+              [class.scale-110]="form.get('colorMarca')?.value === color"
+              (click)="seleccionarColor(color)"
+              [attr.aria-label]="'Color ' + color"
+            ></button>
+          }
+          <!-- Color personalizado -->
+          <input
+            type="color"
+            class="w-7 h-7 rounded-full border-2 border-gray-200 cursor-pointer"
+            [value]="form.get('colorMarca')?.value"
+            (input)="onColorInput($event)"
+            aria-label="Color personalizado"
+          />
+        </div>
+      </div>
+
+      <!-- Imagen -->
+      <div class="flex flex-col gap-2 mb-4">
+        <label class="text-sm font-medium text-gray-700">Imagen del plan</label>
+
+        @if (form.get('imagenUrl')?.value) {
+          <div class="relative w-full h-32 rounded-lg overflow-hidden border border-gray-200">
+            <img
+              [src]="form.get('imagenUrl')?.value"
+              alt="Imagen del plan"
+              class="w-full h-full object-cover"
+            />
+            <button
+              type="button"
+              class="absolute top-1 right-1 bg-white rounded-full p-1 shadow text-gray-600 hover:text-red-500"
+              (click)="form.get('imagenUrl')!.setValue('')"
+              aria-label="Eliminar imagen"
+            >
+              <i class="pi pi-times text-xs"></i>
+            </button>
+          </div>
+        }
+
+        @if (uploading()) {
+          <div class="flex items-center gap-2 text-sm text-gray-500">
+            <p-progressSpinner styleClass="w-5 h-5" />
+            Subiendo imagen...
+          </div>
+        } @else {
+          <label
+            class="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-gray-300 bg-white text-sm text-gray-700 cursor-pointer hover:bg-gray-50 transition-colors"
+          >
+            <i class="pi pi-upload text-sm"></i>
+            Subir imagen
+            <input
+              type="file"
+              accept="image/*"
+              class="hidden"
+              (change)="onImageSelect($event)"
+              aria-label="Seleccionar imagen"
+            />
+          </label>
+        }
+      </div>
+    </section>
+
+    <!-- SECCIÓN: Cobertura -->
+    <section>
+      <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+        Cobertura
+      </h3>
+
+      <!-- Ciudades -->
+      <div class="flex flex-col gap-1 mb-4">
+        <label for="ciudadIds" class="text-sm font-medium text-gray-700">Ciudades</label>
+        <p-multiselect
+          inputId="ciudadIds"
+          formControlName="ciudadIds"
+          [options]="ciudades()"
+          optionLabel="nombre"
+          optionValue="id"
+          placeholder="Seleccionar ciudades"
+          [filter]="true"
+          filterPlaceholder="Buscar ciudad..."
+          styleClass="w-full"
+          display="chip"
+        />
+      </div>
+
+      <!-- Fechas de vigencia -->
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="flex flex-col gap-1">
+          <label for="fechaDesde" class="text-sm font-medium text-gray-700">Desde</label>
+          <p-datepicker
+            inputId="fechaDesde"
+            formControlName="fechaDesde"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="dd/mm/aaaa"
+            styleClass="w-full"
+          />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label for="fechaHasta" class="text-sm font-medium text-gray-700">Hasta</label>
+          <p-datepicker
+            inputId="fechaHasta"
+            formControlName="fechaHasta"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="dd/mm/aaaa"
+            styleClass="w-full"
+          />
+        </div>
+      </div>
+
+      <!-- Días de vigencia -->
+      <div class="mb-4">
+        <label class="text-sm font-medium text-gray-700 block mb-2">Días de vigencia</label>
+        <div class="flex gap-1">
+          @for (dia of diasSemana; track dia.bit) {
+            <button
+              type="button"
+              class="w-9 h-9 rounded-lg text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-red-400"
+              [class]="isDiaActivo(dia.bit)
+                ? 'bg-red-500 text-white'
+                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'"
+              (click)="toggleDia(dia.bit)"
+              [attr.aria-label]="dia.nombre"
+              [attr.aria-pressed]="isDiaActivo(dia.bit)"
+              [pTooltip]="dia.nombre"
+              tooltipPosition="top"
+            >
+              {{ dia.label }}
+            </button>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN: Contacto -->
+    <section>
+      <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+        Contacto
+      </h3>
+
+      <div class="flex flex-col gap-1">
+        <label for="whatsapp" class="text-sm font-medium text-gray-700">
+          WhatsApp
+          <span class="ml-1 text-xs font-normal text-gray-400">(opcional)</span>
+        </label>
+        <div class="flex items-center gap-2">
+          <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-[#25D366] text-white flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+          </span>
+          <input
+            pInputText
+            id="whatsapp"
+            formControlName="whatsapp"
+            placeholder="Ej: 573001234567"
+            class="flex-1"
+            [class.ng-invalid]="hasError('whatsapp', 'pattern')"
+            aria-describedby="whatsapp-hint whatsapp-error"
+          />
+        </div>
+        <small id="whatsapp-hint" class="text-gray-400">
+          Solo dígitos, con código de país. Ej: <strong>573001234567</strong>
+        </small>
+        @if (hasError('whatsapp', 'pattern')) {
+          <small id="whatsapp-error" class="text-red-500">
+            Ingresa solo dígitos (7 a 15), incluyendo el código de país
+          </small>
+        }
+      </div>
+
+      <!-- URL del Sitio -->
+      <div class="flex flex-col gap-1 mt-4">
+        <label for="urlSitio" class="text-sm font-medium text-gray-700">
+          Sitio Web
+          <span class="ml-1 text-xs font-normal text-gray-400">(opcional)</span>
+        </label>
+        <div class="flex items-center gap-2">
+          <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-600 text-white flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </span>
+          <input
+            pInputText
+            id="urlSitio"
+            formControlName="urlSitio"
+            placeholder="Ej: https://www.marca.com"
+            class="flex-1"
+            [class.ng-invalid]="hasError('urlSitio', 'pattern')"
+            aria-describedby="urlSitio-hint urlSitio-error"
+          />
+        </div>
+        <small id="urlSitio-hint" class="text-gray-400">
+          URL completa incluyendo https://
+        </small>
+        @if (hasError('urlSitio', 'pattern')) {
+          <small id="urlSitio-error" class="text-red-500">
+            Ingresa una URL válida que empiece con http:// o https://
+          </small>
+        }
+      </div>
+
+      <!-- Instagram -->
+      <div class="flex flex-col gap-1 mt-4">
+        <label for="instagram" class="text-sm font-medium text-gray-700">
+          Instagram
+          <span class="ml-1 text-xs font-normal text-gray-400">(opcional)</span>
+        </label>
+        <div class="flex items-center gap-2">
+          <span class="flex items-center justify-center w-10 h-10 rounded-lg flex-shrink-0"
+            style="background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </span>
+          <div class="flex-1 flex items-center border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent"
+            [class.border-red-400]="hasError('instagram', 'pattern')">
+            <span class="px-3 py-2 bg-gray-50 text-gray-500 text-sm border-r border-gray-300 select-none">@</span>
+            <input
+              pInputText
+              id="instagram"
+              formControlName="instagram"
+              placeholder="usuario_marca"
+              class="flex-1 border-none shadow-none ring-0 focus:ring-0"
+              aria-describedby="instagram-hint instagram-error"
+            />
+          </div>
+        </div>
+        <small id="instagram-hint" class="text-gray-400">
+          Solo el nombre de usuario, sin @. Ej: <strong>marca_oficial</strong>
+        </small>
+        @if (hasError('instagram', 'pattern')) {
+          <small id="instagram-error" class="text-red-500">
+            Solo letras, números, puntos y guiones bajos (máximo 30 caracteres)
+          </small>
+        }
+      </div>
+    </section>
+
+    <!-- SECCIÓN: Mapa de ubicaciones -->
+    <section>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+          Ubicaciones en el mapa
+        </h3>
+        @if (markers().length > 0) {
+          <p-button
+            label="Limpiar"
+            icon="pi pi-trash"
+            severity="secondary"
+            size="small"
+            [text]="true"
+            (onClick)="limpiarMarcadores()"
+          />
+        }
+      </div>
+      <p class="text-xs text-gray-400 mb-2">
+        Haz clic en el mapa para agregar puntos de venta ({{ markers().length }} punto(s))
+      </p>
+      <div
+        #mapContainer
+        class="w-full rounded-lg border border-gray-200 overflow-hidden"
+        style="height: 280px"
+        aria-label="Mapa de ubicaciones"
+        role="application"
+      ></div>
+    </section>
+
+  </form>
+
+  <!-- Footer fijo -->
+  <ng-template #footer>
+    <div class="flex gap-2 justify-end">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="cerrar()"
+      />
+      <p-button
+        label="Guardar"
+        icon="pi pi-check"
+        [loading]="saving()"
+        [disabled]="form.invalid || saving()"
+        (onClick)="guardar()"
+      />
+    </div>
+  </ng-template>
+</p-drawer>

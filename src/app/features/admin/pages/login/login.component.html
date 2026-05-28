@@ -1,0 +1,79 @@
+<div class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+  <div class="w-full max-w-sm">
+
+    <!-- Logo -->
+    <div class="flex justify-center mb-8">
+      <app-logo />
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+
+      <h1 class="text-xl font-bold text-gray-800 mb-1">Acceso al panel</h1>
+      <p class="text-sm text-gray-400 mb-6">Ingresa tus credenciales de administrador</p>
+
+      <!-- Error -->
+      @if (error()) {
+        <p-message
+          severity="error"
+          [text]="error()!"
+          styleClass="w-full mb-4"
+          aria-live="assertive"
+        />
+      }
+
+      <form [formGroup]="form" (ngSubmit)="iniciarSesion()" class="flex flex-col gap-4" novalidate>
+
+        <!-- Usuario -->
+        <div class="flex flex-col gap-1">
+          <label for="usuario" class="text-sm font-medium text-gray-700">Usuario</label>
+          <input
+            pInputText
+            id="usuario"
+            formControlName="usuario"
+            placeholder="admin"
+            autocomplete="username"
+            [class.ng-invalid]="form.get('usuario')?.invalid && form.get('usuario')?.touched"
+            aria-describedby="usuario-error"
+          />
+          @if (form.get('usuario')?.invalid && form.get('usuario')?.touched) {
+            <small id="usuario-error" class="text-red-500">El usuario es requerido</small>
+          }
+        </div>
+
+        <!-- Contraseña -->
+        <div class="flex flex-col gap-1">
+          <label for="password" class="text-sm font-medium text-gray-700">Contraseña</label>
+          <p-password
+            inputId="password"
+            formControlName="password"
+            placeholder="••••••••"
+            [feedback]="false"
+            [toggleMask]="true"
+            autocomplete="current-password"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [class.ng-invalid]="form.get('password')?.invalid && form.get('password')?.touched"
+            aria-describedby="password-error"
+          />
+          @if (form.get('password')?.invalid && form.get('password')?.touched) {
+            <small id="password-error" class="text-red-500">La contraseña es requerida</small>
+          }
+        </div>
+
+        <!-- Submit -->
+        <p-button
+          type="submit"
+          label="Ingresar"
+          icon="pi pi-sign-in"
+          styleClass="w-full mt-2"
+          severity="danger"
+          [loading]="loading()"
+          [disabled]="form.invalid || loading()"
+        />
+
+      </form>
+    </div>
+
+  </div>
+</div>

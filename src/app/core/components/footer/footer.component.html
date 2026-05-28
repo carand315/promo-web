@@ -1,0 +1,47 @@
+<footer class="bg-gray-900 text-gray-400 mt-auto">
+  <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
+
+      <!-- Marca -->
+      <div>
+        <p class="text-white font-bold text-lg mb-1">Buen Plan</p>
+        <p class="text-xs leading-relaxed">
+          El espacio donde encontrarás los mejores planes y descuentos cerca de ti.
+        </p>
+      </div>
+
+      <!-- Navegación -->
+      <div>
+        <p class="text-white font-semibold text-sm mb-2">Explorar</p>
+        <ul class="space-y-1 text-xs">
+          <li><a routerLink="/" class="hover:text-white transition-colors">Inicio</a></li>
+          <li><a routerLink="/mapa" class="hover:text-white transition-colors">Mapa de planes</a></li>
+        </ul>
+      </div>
+
+      <!-- Legal -->
+      <div>
+        <p class="text-white font-semibold text-sm mb-2">Legal</p>
+        <ul class="space-y-1 text-xs">
+          <li>
+            <a routerLink="/terminos-y-condiciones" class="hover:text-white transition-colors">
+              Términos y condiciones
+            </a>
+          </li>
+          <li>
+            <a href="mailto:info@buenplan.com.co" class="hover:text-white transition-colors">
+              info@buenplan.com.co
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="border-t border-gray-800 pt-4 text-center text-xs">
+      © {{ year }} Buen Plan S.A.S. Todos los derechos reservados.
+    </div>
+
+  </div>
+</footer>

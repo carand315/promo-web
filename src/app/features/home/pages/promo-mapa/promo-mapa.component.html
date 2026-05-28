@@ -1,0 +1,205 @@
+<div class="flex flex-col h-screen bg-[#F8F5F0]">
+  <!-- Navbar -->
+  <app-home-navbar />
+
+  <!-- ── Barra de herramientas ──────────────────────────────────────────────── -->
+  <div
+    class="bg-white border-b border-gray-100 px-4 py-3 flex flex-wrap items-center gap-3 flex-shrink-0"
+  >
+    <!-- Buscador -->
+    <div class="relative flex-1 min-w-52">
+      <i
+        class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-sm"
+      ></i>
+      <input
+        type="text"
+        placeholder="Buscar por título o marca..."
+        class="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-200 bg-gray-50"
+        [value]="searchText()"
+        (input)="searchText.set($any($event.target).value)"
+        aria-label="Buscar planes"
+      />
+    </div>
+
+    <!-- Categoría -->
+    <p-select
+      [options]="categoriaOptions()"
+      [ngModel]="filterCatId()"
+      (ngModelChange)="filterCatId.set($event)"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="!text-sm"
+      aria-label="Filtrar por categoría"
+    />
+
+    <!-- Cerca de mí -->
+    <button
+      (click)="buscarCercaDeMi()"
+      [disabled]="geoLoading()"
+      class="flex items-center gap-2 text-sm font-semibold text-white bg-gray-900 px-4 py-2 rounded-xl hover:bg-gray-700 transition-colors disabled:opacity-50"
+      aria-label="Planes cerca de mi ubicación"
+    >
+      @if (geoLoading()) {
+        <i class="pi pi-spin pi-spinner text-xs"></i>
+      } @else {
+        <i class="pi pi-map-marker text-xs"></i>
+      }
+      <span class="hidden sm:inline">Cerca de mí</span>
+    </button>
+
+    <!-- Contador -->
+    <p class="text-sm text-gray-500 ml-auto hidden sm:block">
+      <span class="font-semibold text-gray-800">{{ promosFiltradas().length }}</span> resultados
+    </p>
+
+    <!-- Tabs móvil -->
+    <div class="flex bg-gray-100 rounded-xl p-0.5 ml-auto sm:ml-0" role="tablist">
+      <button
+        (click)="activeTab.set('lista')"
+        [class]="
+          activeTab() === 'lista'
+            ? 'bg-white text-gray-800 shadow-sm'
+            : 'text-gray-400 hover:text-gray-600'
+        "
+        class="px-3 py-1.5 rounded-[10px] text-sm font-semibold transition-all"
+        role="tab"
+        [attr.aria-selected]="activeTab() === 'lista'"
+      >
+        <i class="pi pi-list text-xs mr-1"></i>Lista
+      </button>
+      <button
+        (click)="activeTab.set('mapa')"
+        [class]="
+          activeTab() === 'mapa'
+            ? 'bg-white text-gray-800 shadow-sm'
+            : 'text-gray-400 hover:text-gray-600'
+        "
+        class="px-3 py-1.5 rounded-[10px] text-sm font-semibold transition-all"
+        role="tab"
+        [attr.aria-selected]="activeTab() === 'mapa'"
+      >
+        <i class="pi pi-map text-xs mr-1"></i>Mapa
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Error geo ─────────────────────────────────────────────────────────── -->
+  @if (geoError()) {
+    <div
+      class="bg-orange-50 border-b border-orange-100 px-4 py-2 text-sm text-orange-600 flex items-center gap-2"
+      role="alert"
+    >
+      <i class="pi pi-exclamation-triangle text-xs"></i>
+      {{ geoError() }}
+      <button (click)="geoError.set(null)" class="ml-auto" aria-label="Cerrar aviso">
+        <i class="pi pi-times text-xs"></i>
+      </button>
+    </div>
+  }
+
+  <!-- ── Cuerpo principal ───────────────────────────────────────────────────── -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Panel listado (oculto en móvil cuando tab=mapa) -->
+    <aside
+      class="w-full lg:w-80 xl:w-96 flex-shrink-0 bg-white border-r border-gray-100 flex flex-col overflow-hidden"
+      [class.hidden]="activeTab() === 'mapa'"
+      [class.lg:flex]="true"
+      [class.flex-col]="true"
+      aria-label="Lista de planes"
+    >
+      <!-- Contador + indicadores de filtro activo -->
+      <div class="px-4 py-2 border-b border-gray-50 flex items-center justify-between gap-2">
+        <p class="text-xs text-gray-400 flex items-center gap-1.5">
+          <span class="font-semibold text-gray-700">{{ promosFiltradas().length }}</span> planes
+          @if (promosEnVista() !== null) {
+            <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-600 text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+              <i class="pi pi-map text-[9px]"></i> área visible
+            </span>
+          }
+        </p>
+        <div class="flex items-center gap-2">
+          @if (promosEnVista() !== null) {
+            <button
+              (click)="verTodos()"
+              class="text-xs text-blue-500 font-semibold hover:underline"
+              aria-label="Mostrar todos los planes"
+            >
+              Ver todos
+            </button>
+          }
+          @if (selectedId()) {
+            <button
+              (click)="clearSelection()"
+              class="text-xs text-[#E8372C] font-semibold hover:underline"
+              aria-label="Limpiar selección"
+            >
+              Limpiar selección
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Cards -->
+      <div class="flex-1 overflow-y-auto" role="list" aria-label="Planes en el mapa">
+        @if (store.loading()) {
+          <div class="flex items-center justify-center h-40">
+            <div
+              class="w-6 h-6 border-4 border-[#E8372C] border-t-transparent rounded-full animate-spin"
+            ></div>
+          </div>
+        } @else {
+          @for (promo of promosFiltradas(); track promo.id) {
+            <div [id]="'promo-card-' + promo.id" role="listitem" (dblclick)="verDetalle(promo)">
+              <app-promo-card-compact
+                [promo]="promo"
+                [selected]="selectedId() === promo.id"
+                (seleccionada)="onCardClick($event)"
+              />
+            </div>
+          } @empty {
+            <div class="flex flex-col items-center justify-center h-48 text-gray-400">
+              <i class="pi pi-inbox text-3xl mb-2"></i>
+              <p class="text-sm">Sin planes con ubicación en los filtros actuales</p>
+            </div>
+          }
+        }
+      </div>
+    </aside>
+
+    <!-- Mapa (oculto en móvil cuando tab=lista) -->
+    <main class="flex-1 relative" [class.hidden]="activeTab() === 'lista'" [class.lg:block]="true">
+      <app-promo-map-view
+        #mapView
+        class="absolute inset-0"
+        [promociones]="promosParaMapa()"
+        [selectedId]="selectedId()"
+        [userLocation]="userLocation()"
+        [fitAllTrigger]="fitAllTrigger()"
+        (promoClicked)="onMarkerClick($event)"
+        (boundsChanged)="promosEnVista.set($event)"
+      />
+
+      <!-- Leyenda colores -->
+      <div
+        class="absolute bottom-6 left-4 bg-white/90 backdrop-blur-sm rounded-xl shadow-md px-3 py-2 text-xs space-y-1 z-[1000]"
+        aria-label="Leyenda de colores"
+      >
+        <p class="font-semibold text-gray-600 mb-1.5">Descuento</p>
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-[#E8372C] inline-block"></span>
+          <span class="text-gray-500">≥ 50%</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-orange-500 inline-block"></span>
+          <span class="text-gray-500">30 – 49%</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+          <span class="text-gray-500">< 30%</span>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<app-footer />

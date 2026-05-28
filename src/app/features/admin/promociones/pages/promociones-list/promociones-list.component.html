@@ -1,0 +1,304 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="p-6 bg-gray-50 min-h-screen">
+
+  <!-- Barra de filtros -->
+  <div class="flex flex-wrap items-center gap-3 mb-5">
+
+    <!-- Búsqueda -->
+    <div class="relative flex-1 min-w-60">
+      <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+      <input
+        pInputText
+        type="text"
+        placeholder="Buscar por título o marca..."
+        class="w-full !pl-9"
+        [value]="searchText()"
+        (input)="searchText.set($any($event.target).value)"
+        aria-label="Buscar planes"
+      />
+    </div>
+
+    <!-- Categoría -->
+    <p-select
+      [options]="categoriaOptions()"
+      [ngModel]="filterCategoriaId()"
+      (ngModelChange)="filterCategoriaId.set($event)"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="w-36"
+      aria-label="Filtrar por categoría"
+    />
+
+    <!-- Ciudad -->
+    <p-select
+      [options]="ciudadOptions()"
+      [ngModel]="filterCiudadId()"
+      (ngModelChange)="filterCiudadId.set($event)"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="w-36"
+      aria-label="Filtrar por ciudad"
+    />
+
+    <!-- Estado -->
+    <p-select
+      [options]="estadoOptions"
+      [ngModel]="filterEstado()"
+      (ngModelChange)="filterEstado.set($event)"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="w-48"
+      aria-label="Filtrar por estado"
+    />
+
+    <!-- Nueva promo -->
+    <p-button
+      label="+ Nuevo plan"
+      severity="danger"
+      (onClick)="nueva()"
+      styleClass="ml-auto font-semibold"
+      aria-label="Crear nuevo plan"
+    />
+  </div>
+
+  <!-- Tabla -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <p-table
+      [value]="promocionesFiltradas()"
+      [loading]="store.loading()"
+      [scrollable]="true"
+      [paginator]="true"
+      [rows]="8"
+      [rowsPerPageOptions]="[8, 16, 24]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando {first}–{last} de {totalRecords} planes"
+      paginatorPosition="bottom"
+      [rowHover]="true"
+      sortField="id"
+      [sortOrder]="1"
+      dataKey="id"
+      styleClass="p-datatable-sm"
+    >
+
+      <ng-template #header>
+        <tr>
+          <th
+            pSortableColumn="id"
+            class="text-xs font-semibold uppercase tracking-wider text-gray-400 bg-white"
+            style="width: 80px"
+          >
+            ID <p-sortIcon field="id" />
+          </th>
+          <th class="text-xs font-semibold uppercase tracking-wider text-gray-400 bg-white">
+            PLAN
+          </th>
+          <th
+            class="text-xs font-semibold uppercase tracking-wider text-gray-400 bg-white"
+            style="width: 150px"
+          >
+            CATEGORÍA
+          </th>
+          <th
+            class="text-xs font-semibold uppercase tracking-wider text-gray-400 bg-white"
+            style="width: 130px"
+          >
+            CIUDAD
+          </th>
+          <th
+            pSortableColumn="descuento"
+            class="text-xs font-semibold uppercase tracking-wider text-gray-400 bg-white"
+            style="width: 140px"
+          >
+            DESCUENTO <p-sortIcon field="descuento" />
+          </th>
+          <th
+            pSortableColumn="fechaHasta"
+            class="text-xs font-semibold uppercase tracking-wider text-gray-400 bg-white"
+            style="width: 130px"
+          >
+            VENCE <p-sortIcon field="fechaHasta" />
+          </th>
+          <th
+            pSortableColumn="totalVisitas"
+            class="text-xs font-semibold uppercase tracking-wider text-gray-400 bg-white"
+            style="width: 110px"
+          >
+            VISITAS <p-sortIcon field="totalVisitas" />
+          </th>
+          <th
+            class="text-xs font-semibold uppercase tracking-wider text-gray-400 bg-white"
+            style="width: 130px"
+          >
+            ESTADO
+          </th>
+          <th
+            class="text-xs font-semibold uppercase tracking-wider text-gray-400 bg-white text-right"
+            style="width: 130px"
+          >
+            ACCIONES
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-p>
+        <tr class="border-t border-gray-50">
+
+          <!-- ID -->
+          <td class="font-mono text-sm font-medium text-gray-400">
+            {{ formatId(p.id) }}
+          </td>
+
+          <!-- Promoción: imagen + título + marca + badge destacada -->
+          <td>
+            <div class="flex items-center gap-3 py-1">
+              @if (p.imagenUrl) {
+                <img
+                  [src]="p.imagenUrl"
+                  [alt]="p.titulo"
+                  class="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                />
+              } @else {
+                <div
+                  class="w-12 h-12 rounded-lg flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                  [style.background-color]="p.colorMarca || '#6B7280'"
+                  [attr.aria-label]="p.marca"
+                >
+                  {{ p.marca?.charAt(0)?.toUpperCase() }}
+                </div>
+              }
+              <div class="min-w-0">
+                <div class="font-semibold text-gray-800 text-sm leading-snug truncate">{{ p.titulo }}</div>
+                <div class="flex items-center gap-1 mt-0.5 text-xs text-gray-400 flex-wrap">
+                  <span>{{ p.marca }}</span>
+                  @if (p.destacada) {
+                    <span>·</span>
+                    <i class="pi pi-star-fill text-yellow-400"></i>
+                    <span>destacada</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </td>
+
+          <!-- Categoría -->
+          <td class="text-sm text-gray-600">
+            {{ getCategoriaNombre(p.categoriaId) }}
+          </td>
+
+          <!-- Ciudad -->
+          <td class="text-sm text-gray-600">
+            {{ getCiudadNombre(p.ciudadIds) }}
+          </td>
+
+          <!-- Descuento -->
+          <td>
+            @if (p.descuento > 0) {
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-red-50 text-red-500 border border-red-100">
+                – {{ p.descuento }}&nbsp;%
+              </span>
+            } @else {
+              <span class="text-gray-300 text-sm">—</span>
+            }
+          </td>
+
+          <!-- Vence -->
+          <td class="text-sm text-gray-600">
+            @if (p.fechaHasta) {
+              {{ p.fechaHasta | date:'d MMM y' | lowercase }}
+            } @else {
+              <span class="text-gray-300">—</span>
+            }
+          </td>
+
+          <!-- Visitas -->
+          <td>
+            @if (p.totalVisitas > 0) {
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[15px] text-gray-400">visibility</span>
+                <span class="text-sm font-medium text-gray-700">{{ p.totalVisitas }}</span>
+              </div>
+            } @else {
+              <span class="text-gray-300 text-sm">—</span>
+            }
+          </td>
+
+          <!-- Estado -->
+          <td>
+            @switch (getEstado(p.fechaHasta)) {
+              @case ('activa') {
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
+                  Activa
+                </span>
+              }
+              @case ('vencida') {
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 border border-gray-200">
+                  Vencida
+                </span>
+              }
+              @case ('vence_pronto') {
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-600 border border-orange-200">
+                  Vence pronto
+                </span>
+              }
+            }
+          </td>
+
+          <!-- Acciones -->
+          <td>
+            <div class="flex gap-0.5 justify-end">
+              <p-button
+                icon="pi pi-eye"
+                [text]="true"
+                severity="secondary"
+                size="small"
+                (onClick)="ver(p)"
+                [attr.aria-label]="'Ver ' + p.titulo"
+              />
+              <p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                severity="secondary"
+                size="small"
+                (onClick)="editar(p)"
+                [attr.aria-label]="'Editar ' + p.titulo"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                severity="danger"
+                size="small"
+                (onClick)="confirmarEliminar(p)"
+                [attr.aria-label]="'Eliminar ' + p.titulo"
+              />
+            </div>
+          </td>
+
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="9" class="text-center py-16 text-gray-400">
+            <i class="pi pi-inbox text-4xl block mb-3"></i>
+            <p class="text-sm">No hay planes que coincidan con los filtros</p>
+          </td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+  </div>
+
+</div>
+
+<!-- Drawer de formulario -->
+@if (store.drawerVisible()) {
+  <app-promocion-form
+    [promocion]="store.selectedPromocion()"
+    [categorias]="store.categorias()"
+    [ciudades]="store.ciudades()"
+    (guardado)="onGuardado($event)"
+    (cancelado)="store.closeDrawer()"
+  />
+}

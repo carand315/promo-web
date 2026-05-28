@@ -1,0 +1,54 @@
+<div
+  class="flex items-center gap-3 px-4 py-3 border-b border-gray-100 transition-colors cursor-pointer"
+  [class.bg-red-50]="selected()"
+  [class.border-l-2]="selected()"
+  [class.border-l-[#E8372C]]="selected()"
+  [class.hover:bg-gray-50]="!selected()"
+>
+
+  <!-- Avatar / imagen -->
+  <div class="flex-shrink-0 w-11 h-11 rounded-xl overflow-hidden">
+    @if (promo().imagenUrl) {
+      <img
+        [src]="promo().imagenUrl"
+        [alt]="promo().titulo"
+        class="w-full h-full object-cover"
+      />
+    } @else {
+      <div
+        class="w-full h-full flex items-center justify-center text-white text-sm font-bold"
+        [style.background-color]="promo().colorMarca || '#6B7280'"
+      >
+        {{ promo().marca.charAt(0) }}
+      </div>
+    }
+  </div>
+
+  <!-- Info -->
+  <div class="flex-1 min-w-0">
+    <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 truncate">
+      {{ promo().marca }}
+    </p>
+    <p class="text-sm font-semibold text-gray-800 leading-snug line-clamp-1">
+      {{ promo().titulo }}
+    </p>
+    @if (ciudadNombre()) {
+      <p class="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+        <i class="pi pi-map-marker text-[10px]"></i>
+        {{ ciudadNombre() }}
+      </p>
+    }
+  </div>
+
+  <!-- Badge descuento -->
+  @if (promo().descuento > 0) {
+    <div
+      class="flex-shrink-0 text-white text-xs font-bold px-2 py-1 rounded-lg"
+      [style.background-color]="markerColor()"
+      [attr.aria-label]="promo().descuento + '% de descuento'"
+    >
+      –{{ promo().descuento }}%
+    </div>
+  }
+
+</div>

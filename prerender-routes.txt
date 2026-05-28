@@ -1,0 +1,15 @@
+/
+/mapa
+/categorias/restaurantes
+/categorias/ropa
+/categorias/cine
+/categorias/farmacias
+/categorias/belleza
+/categorias/tecnologia
+/categorias/deportes
+/categorias/cafeterias
+/categorias/viajes
+/categorias/hogar
+/categorias/carros
+/categorias/supermercados
+/categorias/mascotas

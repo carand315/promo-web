@@ -1,0 +1,457 @@
+<div class="min-h-screen bg-[#F8F5F0]">
+
+  <!-- ── Barra superior ─────────────────────────────────────────────────── -->
+  <div class="bg-[#F8F5F0] border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+
+      <!-- Breadcrumb + back -->
+      <div class="flex items-center gap-3 text-sm text-gray-500">
+        <button
+          (click)="volver()"
+          class="flex items-center gap-1.5 text-gray-500 hover:text-gray-800 transition-colors"
+          aria-label="Volver al portal"
+        >
+          <i class="pi pi-arrow-left text-xs"></i>
+          <span>Volver al portal</span>
+        </button>
+        <span class="text-gray-300">|</span>
+        <nav aria-label="Breadcrumb">
+          <ol class="flex items-center gap-1.5">
+            <li>
+              <button (click)="volver()" class="hover:text-gray-800 transition-colors">
+                Planes
+              </button>
+            </li>
+            @if (ciudadNombres().length === 1) {
+              <li class="flex items-center gap-1.5">
+                <span>/</span>
+                <span>{{ ciudadNombres()[0] }}</span>
+              </li>
+            } @else if (ciudadNombres().length > 1) {
+              <li class="flex items-center gap-1.5">
+                <span>/</span>
+                <span>Varias ciudades</span>
+              </li>
+            }
+            @if (promo()) {
+              <li class="flex items-center gap-1.5 text-gray-800 font-medium">
+                <span>/</span>
+                <span class="line-clamp-1 max-w-48">{{ promo()!.titulo }}</span>
+              </li>
+            }
+          </ol>
+        </nav>
+      </div>
+
+      <!-- Logo -->
+      <app-logo size="sm" />
+
+    </div>
+  </div>
+
+  <!-- ── Loading ────────────────────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="flex items-center justify-center h-96">
+      <div class="w-8 h-8 border-4 border-[#E8372C] border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  } @else if (promo()) {
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" animate.enter="page-fade-up">
+
+      <!-- ── Hero (2 columnas) ─────────────────────────────────────────── -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10 lg:items-stretch">
+
+        <!-- Col izquierda: texto — distribuido de arriba a abajo -->
+        <div class="flex flex-col gap-5">
+
+          <!-- Descuento hero -->
+          @if (promo()!.descuento > 0) {
+            <div class="flex items-end gap-4 pb-5 border-b border-gray-100">
+              <span class="text-8xl font-black text-[#E8372C] leading-none tabular-nums">
+                {{ promo()!.descuento }}%
+              </span>
+              <div class="pb-1">
+                <p class="text-xl font-bold text-gray-800 leading-tight">DE DESCUENTO</p>
+                <p class="text-sm text-gray-400 mt-0.5">en {{ promo()!.marca }}</p>
+              </div>
+            </div>
+          }
+
+          <!-- Tags chips -->
+          <div class="flex flex-wrap items-center gap-2">
+            @if (categoriaNombre()) {
+              <span class="inline-flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3 py-1 text-sm text-gray-600">
+                <i class="pi pi-tag text-xs text-gray-400"></i>
+                {{ categoriaNombre() }}
+              </span>
+            }
+            @for (nombre of ciudadNombres(); track nombre) {
+              <span class="inline-flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3 py-1 text-sm text-gray-600">
+                <i class="pi pi-map-marker text-xs text-gray-400"></i>
+                {{ nombre }}
+              </span>
+            }
+          </div>
+
+          <!-- Título -->
+          <h1 class="text-4xl sm:text-5xl font-black text-gray-900 leading-tight" style="font-family: 'Bricolage Grotesque', sans-serif;">
+            {{ promo()!.titulo }}
+          </h1>
+
+          <!-- Metadatos -->
+          <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+            @if (promo()!.fechaHasta) {
+              <span class="flex items-center gap-1.5">
+                <i class="pi pi-calendar text-gray-400"></i>
+                Hasta el {{ promo()!.fechaHasta | date:'d MMM' | lowercase }}
+              </span>
+            }
+            @if (diasPorSemana() > 0) {
+              <span class="flex items-center gap-1.5">
+                <i class="pi pi-clock text-gray-400"></i>
+                {{ diasPorSemana() }} día{{ diasPorSemana() !== 1 ? 's' : '' }}/semana
+              </span>
+            }
+            @if (promo()!.destacada) {
+              <span class="flex items-center gap-1.5 text-amber-500 font-medium">
+                <i class="pi pi-star-fill"></i>
+                Plan destacado
+              </span>
+            }
+          </div>
+
+          <!-- Botones -->
+          <div class="flex items-center gap-3 flex-wrap">
+            <button
+              (click)="abrirComoLlegar()"
+              class="flex items-center gap-2 bg-gray-900 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-700 transition-colors"
+              aria-label="Cómo llegar"
+            >
+              <i class="pi pi-map-marker"></i>
+              Cómo llegar
+            </button>
+
+            @if (promo()!.whatsapp) {
+              <button
+                (click)="abrirWhatsapp()"
+                class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all hover:scale-105 active:scale-95 shadow-lg shadow-green-200"
+                style="background-color: #25D366;"
+                aria-label="Contactar por WhatsApp"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+                WhatsApp
+              </button>
+            }
+
+            @if (promo()!.urlSitio) {
+              <button
+                (click)="abrirSitio()"
+                class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white bg-blue-600 transition-all hover:bg-blue-700 hover:scale-105 active:scale-95 shadow-lg shadow-blue-200"
+                aria-label="Visitar sitio web"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                Sitio Web
+              </button>
+            }
+
+            @if (promo()!.instagram) {
+              <button
+                (click)="abrirInstagram()"
+                class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all hover:scale-105 active:scale-95 shadow-lg"
+                style="background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);"
+                aria-label="Ver Instagram"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+                Instagram
+              </button>
+            }
+
+            <button
+              (click)="abrirComoLlegar()"
+              class="w-10 h-10 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-500 hover:border-gray-400 transition-colors"
+              aria-label="Compartir"
+            >
+              <i class="pi pi-share-alt text-sm"></i>
+            </button>
+          </div>
+
+          <!-- Mini stats — rellena el espacio inferior -->
+          <div class="mt-auto grid grid-cols-3 gap-3 pt-5 border-t border-gray-100">
+            <div class="bg-white rounded-xl border border-gray-100 p-3 text-center">
+              <p class="text-2xl font-black text-gray-800">{{ diasRestantes() ?? '∞' }}</p>
+              <p class="text-[10px] text-gray-400 font-semibold tracking-wider mt-0.5">DÍAS REST.</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-100 p-3 text-center">
+              <p class="text-2xl font-black text-gray-800">{{ diasPorSemana() }}</p>
+              <p class="text-[10px] text-gray-400 font-semibold tracking-wider mt-0.5">DÍAS/SEM.</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-100 p-3 text-center">
+              @if (ciudadNombres().length > 1) {
+                <p class="text-2xl font-black text-gray-800">{{ ciudadNombres().length }}</p>
+                <p class="text-[10px] text-gray-400 font-semibold tracking-wider mt-0.5">CIUDADES</p>
+              } @else {
+                <p class="text-2xl font-black text-gray-800 truncate">{{ ciudadNombres()[0] || '—' }}</p>
+                <p class="text-[10px] text-gray-400 font-semibold tracking-wider mt-0.5">CIUDAD</p>
+              }
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Col derecha: imagen hero — ocupa toda la altura de la col izquierda -->
+        <div class="relative rounded-2xl overflow-hidden min-h-[480px]"
+          [style.background-color]="promo()!.colorMarca || '#1a1a1a'">
+
+          @if (promo()!.imagenUrl) {
+            <img
+              [src]="promo()!.imagenUrl"
+              [alt]="promo()!.titulo"
+              class="absolute inset-0 w-full h-full object-cover"
+            />
+          } @else {
+            <div class="absolute inset-0 flex items-center justify-center text-white text-8xl font-black opacity-20">
+              {{ promo()!.marca.charAt(0) }}
+            </div>
+          }
+
+          <!-- Pill marca -->
+          <div class="absolute top-4 left-4 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2">
+            <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
+              [style.background-color]="promo()!.colorMarca || '#E8372C'">
+              {{ promo()!.marca.slice(0, 2).toUpperCase() }}
+            </div>
+            <span class="text-white text-sm font-semibold">{{ promo()!.marca }}</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Contenido principal + Sidebar ─────────────────────────────── -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Col principal (2/3) -->
+        <div class="lg:col-span-2 space-y-5">
+
+          <!-- Sobre esta promoción -->
+          <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
+                <i class="pi pi-info-circle text-[#E8372C] text-xs"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-800 text-sm">Sobre este plan</p>
+                <p class="text-xs text-gray-400">Detalles y condiciones</p>
+              </div>
+            </div>
+            <p class="text-gray-700 leading-relaxed mb-4">{{ promo()!.descripcion || 'Sin descripción disponible.' }}</p>
+            <div class="flex flex-wrap gap-2">
+              @if (categoriaNombre()) {
+                <span class="inline-flex items-center gap-1.5 bg-gray-100 rounded-full px-3 py-1 text-xs text-gray-600">
+                  <i class="pi pi-tag text-xs"></i> {{ categoriaNombre() }}
+                </span>
+              }
+              @for (nombre of ciudadNombres(); track nombre) {
+                <span class="inline-flex items-center gap-1.5 bg-gray-100 rounded-full px-3 py-1 text-xs text-gray-600">
+                  <i class="pi pi-map-marker text-xs"></i> {{ nombre }}
+                </span>
+              }
+              <span class="inline-flex items-center gap-1.5 bg-gray-100 rounded-full px-3 py-1 text-xs text-gray-600">
+                <i class="pi pi-shop text-xs"></i> {{ promo()!.marca }}
+              </span>
+              @if (promo()!.destacada) {
+                <span class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 rounded-full px-3 py-1 text-xs font-medium">
+                  <i class="pi pi-star-fill text-xs"></i> Destacada
+                </span>
+              }
+            </div>
+          </div>
+
+          <!-- Vigencia -->
+          @if (promo()!.fechaDesde || promo()!.fechaHasta) {
+            <div class="bg-white rounded-2xl border border-gray-100 p-6">
+              <div class="flex items-center gap-2 mb-5">
+                <div class="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
+                  <i class="pi pi-calendar text-[#E8372C] text-xs"></i>
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">Vigencia</p>
+                  <p class="text-xs text-gray-400">Período en que aplica el plan</p>
+                </div>
+              </div>
+
+              <!-- Barra de progreso -->
+              <div class="relative mb-2 mt-8">
+                <!-- Label HOY -->
+                @if (progresoVigencia() > 0 && progresoVigencia() < 100) {
+                  <div
+                    class="absolute -top-6 flex flex-col items-center"
+                    [style.left]="progresoVigencia() + '%'"
+                    style="transform: translateX(-50%)"
+                  >
+                    <span class="bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded">HOY</span>
+                  </div>
+                }
+                <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    class="h-full bg-[#E8372C] rounded-full transition-all duration-500"
+                    [style.width]="progresoVigencia() + '%'"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="flex justify-between text-xs text-gray-400 mt-3">
+                <div>
+                  <p class="font-semibold text-gray-500 uppercase tracking-wider text-[10px]">Desde</p>
+                  <p class="text-sm font-semibold text-gray-700 mt-0.5">
+                    {{ promo()!.fechaDesde ? (promo()!.fechaDesde | date:'d MMM yyyy') : '—' }}
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p class="font-semibold text-gray-500 uppercase tracking-wider text-[10px]">Hasta</p>
+                  <p class="text-sm font-semibold text-gray-700 mt-0.5">
+                    {{ promo()!.fechaHasta ? (promo()!.fechaHasta | date:'d MMM yyyy') : '—' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Días disponibles -->
+          <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <div class="flex items-center gap-2 mb-5">
+              <div class="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
+                <i class="pi pi-clock text-[#E8372C] text-xs"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-800 text-sm">Días disponibles</p>
+                <p class="text-xs text-gray-400">Próxima semana</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-7 gap-2">
+              @for (dia of diasCalendario(); track dia.label) {
+                <div
+                  class="flex flex-col items-center gap-1.5 rounded-xl py-3 px-1 transition-all"
+                  [class]="dia.activo
+                    ? 'bg-[#E8372C] text-white shadow-sm'
+                    : 'bg-gray-50 text-gray-300'"
+                  [attr.aria-label]="dia.nombre + (dia.activo ? ' disponible' : ' no disponible')"
+                >
+                  <span class="text-xs font-bold tracking-wider">{{ dia.label }}</span>
+                  <span class="text-lg font-black leading-none">{{ dia.fecha }}</span>
+                  @if (dia.esHoy) {
+                    <span class="w-1.5 h-1.5 rounded-full"
+                      [class]="dia.activo ? 'bg-white/70' : 'bg-[#E8372C]'">
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sidebar (1/3) -->
+        <div class="space-y-5">
+
+          <!-- Mapa -->
+          <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+            <div
+              #mapContainer
+              class="w-full"
+              style="height: 490px;"
+              aria-label="Mapa de ubicación"
+              role="application"
+            ></div>
+            <div class="p-4 space-y-3">
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  (click)="abrirComoLlegar()"
+                  class="flex items-center justify-center gap-2 bg-gray-900 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-700 transition-colors"
+                  [class.opacity-50]="!primerMarker()"
+                  [disabled]="!primerMarker()"
+                  aria-label="Cómo llegar"
+                >
+                  <i class="pi pi-map-marker text-xs"></i>
+                  Cómo llegar
+                </button>
+                <button
+                  (click)="abrirWaze()"
+                  class="flex items-center justify-center gap-2 border border-gray-200 bg-white text-gray-700 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors"
+                  [class.opacity-50]="!primerMarker()"
+                  [disabled]="!primerMarker()"
+                  aria-label="Abrir en Waze"
+                >
+                  <i class="pi pi-external-link text-xs"></i>
+                  Waze
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Promos similares -->
+          @if (similares().length > 0) {
+            <div class="bg-white rounded-2xl border border-gray-100 p-5">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
+                  <i class="pi pi-th-large text-[#E8372C] text-xs"></i>
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">Planes similares</p>
+                  <p class="text-xs text-gray-400">{{ ciudadNombres().length === 1 ? ciudadNombres()[0] : 'Tu área' }} y categoría</p>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                @for (s of similares(); track s.id) {
+                  <button
+                    (click)="verSimilar(s)"
+                    class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors text-left"
+                    [attr.aria-label]="'Ver plan ' + s.titulo"
+                  >
+                    <!-- Imagen/color -->
+                    <div class="w-12 h-12 rounded-xl flex-shrink-0 overflow-hidden">
+                      @if (s.imagenUrl) {
+                        <img [src]="s.imagenUrl" [alt]="s.titulo" class="w-full h-full object-cover" />
+                      } @else {
+                        <div class="w-full h-full flex items-center justify-center text-white text-sm font-bold"
+                          [style.background-color]="s.colorMarca || '#E8372C'">
+                          {{ s.marca.charAt(0) }}
+                        </div>
+                      }
+                    </div>
+                    <!-- Info -->
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider truncate">{{ s.marca }}</p>
+                      <p class="text-sm font-semibold text-gray-800 line-clamp-1 leading-snug">{{ s.titulo }}</p>
+                      <p class="text-xs text-gray-400 truncate">{{ ciudadNombreDe(s) }}</p>
+                    </div>
+                    <!-- Badge -->
+                    @if (s.descuento > 0) {
+                      <span class="flex-shrink-0 text-sm font-bold text-[#E8372C]">
+                        –{{ s.descuento }}%
+                      </span>
+                    }
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+      </div>
+
+    </div>
+  }
+
+</div>
+
+<app-footer />

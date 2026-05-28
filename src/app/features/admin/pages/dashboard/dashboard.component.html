@@ -1,0 +1,347 @@
+<!-- ── KPI Cards ──────────────────────────────────────────────────────────── -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+  @for (card of statCards(); track card.title; let i = $index) {
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3"
+         animate.enter="stat-card-enter" [style.--delay]="i * 80 + 'ms'">
+
+      <!-- Icono + valor en la misma fila -->
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-3 min-w-0">
+          <div [class]="card.iconBg + ' w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0'">
+            <span class="material-symbols-outlined text-[28px] leading-none" [class]="card.iconColor">
+              {{ card.icon }}
+            </span>
+          </div>
+          @if (loading()) {
+            <div class="h-9 w-20 bg-gray-100 rounded animate-pulse"></div>
+          } @else {
+            <div class="min-w-0">
+              <p class="text-3xl font-bold text-gray-900 leading-none">{{ card.value }}</p>
+              <p class="text-sm text-gray-500 mt-1 truncate">{{ card.title }}</p>
+            </div>
+          }
+        </div>
+        <div class="w-1 h-14 rounded-full flex-shrink-0" [style.background]="card.accentColor"></div>
+      </div>
+
+      <p class="text-xs font-medium flex items-center gap-1"
+         [class]="card.trendType === 'positive' ? 'text-green-600'
+                : card.trendType === 'warning'  ? 'text-orange-500'
+                : card.trendType === 'info'     ? 'text-blue-600'
+                :                                 'text-gray-400'">
+        @if (card.trendType === 'positive') {
+          <span class="material-symbols-outlined text-[13px] leading-none">trending_up</span>
+        } @else if (card.trendType === 'warning') {
+          <span class="material-symbols-outlined text-[13px] leading-none">warning</span>
+        } @else if (card.trendType === 'info') {
+          <span class="material-symbols-outlined text-[13px] leading-none">trending_up</span>
+        }
+        {{ card.trend }}
+      </p>
+
+    </div>
+  }
+</div>
+
+<!-- ── Fila: Categorías + Top ciudades ─────────────────────────────────────── -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+  <!-- Promociones por categoría -->
+  <div class="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="font-semibold text-gray-800">Planes por categoría</h2>
+      <span class="text-xs text-gray-400">{{ promosPorCategoria().length }} categorías</span>
+    </div>
+
+    @if (loading()) {
+      <div class="space-y-3">
+        @for (_ of [1,2,3,4,5]; track $index) {
+          <div class="h-4 bg-gray-100 rounded animate-pulse"></div>
+        }
+      </div>
+    } @else if (promosPorCategoria().length === 0) {
+      <p class="text-sm text-gray-400 text-center py-6">Sin datos disponibles</p>
+    } @else {
+      <div class="space-y-3">
+        @for (cat of promosPorCategoria(); track cat.categoriaId) {
+          <div class="flex items-center gap-3">
+
+            <!-- Ícono + nombre -->
+            <div class="flex items-center gap-2 w-36 flex-shrink-0 min-w-0">
+              <span
+                class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                [style.background-color]="cat.categoriaColor + '22'"
+              >
+                <span
+                  class="material-symbols-outlined text-[17px] leading-none"
+                  [style.color]="cat.categoriaColor"
+                >{{ cat.categoriaIcono }}</span>
+              </span>
+              <span class="text-sm text-gray-600 truncate">{{ cat.categoriaNombre }}</span>
+            </div>
+
+            <!-- Barra -->
+            <div class="flex-1 bg-gray-100 rounded-full h-2">
+              <div
+                class="h-2 rounded-full transition-all duration-500"
+                [style.background]="cat.categoriaColor"
+                [style.width]="barWidth(cat.totalPromos, maxCategoria())"
+              ></div>
+            </div>
+
+            <span class="text-sm font-semibold text-gray-700 w-4 text-right flex-shrink-0">{{ cat.totalPromos }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Top ciudades -->
+  <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+    <h2 class="font-semibold text-gray-800 mb-5">Top ciudades</h2>
+
+    @if (loading()) {
+      <div class="space-y-4">
+        @for (_ of [1,2,3,4,5]; track $index) {
+          <div class="h-4 bg-gray-100 rounded animate-pulse"></div>
+        }
+      </div>
+    } @else if (topCiudades().length === 0) {
+      <p class="text-sm text-gray-400 text-center py-6">Sin datos disponibles</p>
+    } @else {
+      <div class="space-y-4">
+        @for (ciudad of topCiudades(); track ciudad.ciudadId; let i = $index) {
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="text-sm font-bold w-7 flex-shrink-0"
+                    [class]="i === 0 ? 'text-[#E8372C]' : i === 1 ? 'text-orange-400' : i === 2 ? 'text-amber-400' : 'text-gray-400'">
+                #{{ i + 1 }}
+              </span>
+              <span class="text-sm text-gray-700">{{ ciudad.ciudadNombre }}</span>
+            </div>
+            <span class="text-xs text-gray-400">{{ ciudad.totalPromos }} planes</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+</div>
+
+<!-- ── Top Promos Visitadas ─────────────────────────────────────────────────── -->
+<div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 mt-4">
+  <div class="flex items-center justify-between mb-5">
+    <div>
+      <h2 class="font-semibold text-gray-800">Top planes visitados</h2>
+      <p class="text-xs text-gray-400 mt-0.5">Últimos 30 días · deduplicado por sesión</p>
+    </div>
+    <span class="text-xs text-[#E8372C] font-medium flex items-center gap-1">
+      <span class="material-symbols-outlined text-[14px] leading-none">bar_chart</span>
+      Analítica real
+    </span>
+  </div>
+
+  @if (loadingVisitas()) {
+    <div class="flex justify-center py-8">
+      <p-progressSpinner strokeWidth="3" styleClass="w-8 h-8" />
+    </div>
+  } @else if (topPromos().length === 0) {
+    <div class="text-center py-8 text-gray-400">
+      <span class="material-symbols-outlined text-4xl block mb-2">visibility_off</span>
+      <p class="text-sm">Aún no hay visitas registradas</p>
+    </div>
+  } @else {
+    <div class="space-y-3">
+      @for (promo of topPromos(); track promo.promoId; let i = $index) {
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-bold w-5 flex-shrink-0"
+            [class]="i === 0 ? 'text-[#E8372C]' : i === 1 ? 'text-orange-400' : 'text-gray-400'">
+            #{{ i + 1 }}
+          </span>
+          <div class="w-9 h-9 rounded-lg flex-shrink-0 overflow-hidden bg-gray-100">
+            @if (promo.imagenUrl) {
+              <img [src]="promo.imagenUrl" [alt]="promo.titulo" class="w-full h-full object-cover" />
+            } @else {
+              <div class="w-full h-full flex items-center justify-center text-gray-400 text-sm font-bold">
+                {{ promo.marca.charAt(0) }}
+              </div>
+            }
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between mb-1">
+              <p class="text-sm font-medium text-gray-800 truncate">{{ promo.titulo }}</p>
+              <div class="flex items-center gap-1.5 ml-2 flex-shrink-0">
+                @if (tendencia(promo) === 'up') {
+                  <span class="material-symbols-outlined text-[11px] text-green-500 leading-none">trending_up</span>
+                }
+                <span class="text-xs font-semibold text-gray-700">{{ promo.totalVisitas }}</span>
+              </div>
+            </div>
+            <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div class="h-full bg-[#E8372C] rounded-full transition-all duration-500"
+                   [style.width]="(promo.totalVisitas / maxVisitas() * 100) + '%'"></div>
+            </div>
+            <p class="text-[10px] text-gray-400 mt-0.5">
+              {{ promo.visitasUltimos7Dias }} en los últimos 7 días
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- ── Fila: Dona + Días + Descuento por categoría ─────────────────────────── -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
+
+  <!-- Estado de promociones (donut) -->
+  <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-semibold text-gray-800">Estado de planes</h2>
+      <span class="text-xs text-blue-500 font-medium">Distribución</span>
+    </div>
+
+    @if (loading()) {
+      <div class="flex justify-center py-8">
+        <p-progressSpinner strokeWidth="3" styleClass="w-8 h-8" />
+      </div>
+    } @else {
+      <div class="flex items-center gap-4">
+        <!-- Donut SVG -->
+        <div class="relative w-24 h-24 flex-shrink-0">
+          <svg viewBox="0 0 36 36" class="w-24 h-24 -rotate-90">
+            <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#f3f4f6" stroke-width="3.5" />
+            <!-- Activas (verde) -->
+            <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#22c55e" stroke-width="3.5"
+              [attr.stroke-dasharray]="donutSegments().activasArr"
+              stroke-dashoffset="0" />
+            <!-- Por vencer (ámbar) -->
+            <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#f59e0b" stroke-width="3.5"
+              [attr.stroke-dasharray]="donutSegments().porVencerArr"
+              [attr.stroke-dashoffset]="donutSegments().porVencerOffset" />
+            <!-- Vencidas (gris) -->
+            <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#9ca3af" stroke-width="3.5"
+              [attr.stroke-dasharray]="donutSegments().vencidasArr"
+              [attr.stroke-dashoffset]="donutSegments().vencidasOffset" />
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-lg font-bold text-gray-900">{{ estadoPromos().total }}</span>
+            <span class="text-[9px] text-gray-400 uppercase tracking-wide">PLANES</span>
+          </div>
+        </div>
+
+        <!-- Leyenda -->
+        <div class="space-y-2 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-green-500 flex-shrink-0"></span>
+            <span class="text-xs text-gray-600">Activas</span>
+            <span class="text-xs font-semibold text-gray-800 ml-auto">
+              {{ estadoPromos().activas }}
+              <span class="text-gray-400">{{ donutSegments().activasPct }}%</span>
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 flex-shrink-0"></span>
+            <span class="text-xs text-gray-600">Por vencer</span>
+            <span class="text-xs font-semibold text-gray-800 ml-auto">
+              {{ estadoPromos().porVencer }}
+              <span class="text-gray-400">{{ donutSegments().porVencerPct }}%</span>
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-gray-400 flex-shrink-0"></span>
+            <span class="text-xs text-gray-600">Vencidas</span>
+            <span class="text-xs font-semibold text-gray-800 ml-auto">
+              {{ estadoPromos().vencidas }}
+              <span class="text-gray-400">{{ donutSegments().vencidasPct }}%</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Promos activas por día -->
+  <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-semibold text-gray-800">Planes activos por día</h2>
+      <span class="text-xs text-blue-500 font-medium">Cobertura semanal</span>
+    </div>
+
+    @if (loading()) {
+      <div class="h-24 bg-gray-100 rounded animate-pulse"></div>
+    } @else if (diasSemana().length === 0) {
+      <p class="text-sm text-gray-400 text-center py-6">Sin datos</p>
+    } @else {
+      <div class="flex items-end gap-1.5 h-24">
+        @for (dia of diasSemana(); track dia.label) {
+          <div class="flex-1 flex flex-col items-center gap-1">
+            <span class="text-[10px] text-gray-500 font-medium">{{ dia.promos }}</span>
+            <div class="w-full flex items-end" style="height: 64px">
+              <div
+                class="w-full rounded-t transition-all duration-500"
+                [style.height]="barHeight(dia.promos)"
+                [style.background]="dia.promos === maxPromosDia() ? '#E8372C' : '#fca5a5'"
+              ></div>
+            </div>
+            <span class="text-[9px] text-gray-400 uppercase">{{ dia.label }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Descuento promedio por categoría -->
+  <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-semibold text-gray-800 text-sm">Descuento promedio por categoría</h2>
+      <span class="text-xs text-blue-500 font-medium">Análisis</span>
+    </div>
+
+    @if (loading()) {
+      <div class="space-y-3">
+        @for (_ of [1,2,3,4]; track $index) {
+          <div class="h-6 bg-gray-100 rounded animate-pulse"></div>
+        }
+      </div>
+    } @else if (descuentoPorCategoria().length === 0) {
+      <p class="text-sm text-gray-400 text-center py-6">Sin datos disponibles</p>
+    } @else {
+      <div class="space-y-3">
+        @for (item of descuentoPorCategoria(); track item.categoriaNombre) {
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs text-gray-600">{{ item.categoriaNombre }}</span>
+              <span class="text-[10px] text-gray-400">{{ item.totalPromos }} planes</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
+                <!-- Barra coloreada con el color de la categoría -->
+                <div
+                  class="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
+                  [style.width]="item.descuentoPromedio + '%'"
+                  [style.background]="item.categoriaColor || '#E8372C'"
+                ></div>
+                <!-- Texto centrado dentro de la barra coloreada (solo si cabe) -->
+                @if (item.descuentoPromedio >= 18) {
+                  <span class="absolute inset-y-0 left-0 flex items-center justify-center
+                                text-[10px] font-bold text-white pointer-events-none"
+                        [style.width]="item.descuentoPromedio + '%'">
+                    {{ Math.round(item.descuentoPromedio) }}%
+                  </span>
+                }
+              </div>
+              <!-- Texto fuera si la barra es muy corta -->
+              @if (item.descuentoPromedio < 18) {
+                <span class="text-[10px] font-bold text-gray-600 w-8 flex-shrink-0 text-left">
+                  {{ Math.round(item.descuentoPromedio) }}%
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+</div>
