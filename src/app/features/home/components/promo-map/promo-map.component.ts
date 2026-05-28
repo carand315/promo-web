@@ -82,8 +82,9 @@ export class PromoMapComponent implements OnDestroy {
 
   constructor() {
     afterNextRender(async () => {
-      this.L = await import('leaflet');
-      this.markersLayer = this.L.featureGroup();
+      const mod = await import('leaflet');
+      this.L = (mod as any).default ?? mod;
+      this.markersLayer = this.L!.featureGroup();
       this.initMap();
       this.updateMarkers(this.promociones());
     });
