@@ -51,8 +51,8 @@ export class PromoDetalleComponent implements OnInit, OnDestroy {
 
   constructor() {
     afterNextRender(async () => {
-      const L = await import('leaflet');
-      this.leaflet.set(L);
+      const mod = await import('leaflet');
+      this.leaflet.set((mod as any).default ?? mod);
     });
 
     effect(() => {
