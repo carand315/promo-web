@@ -142,9 +142,13 @@ export class PromoMapViewComponent implements OnDestroy {
 
   // ── API pública ──────────────────────────────────────────────────────────────
 
-  /** Calcula qué promos tienen al menos un marker en los bounds actuales y emite sus IDs. */
+  /** Calcula qué promos tienen al menos un marker en los bounds actuales y emite sus IDs.
+   *  No emite si el contenedor está oculto (display:none → tamaño 0), para evitar
+   *  que un mapa invisible sobreescriba el filtro del listado con un array vacío. */
   private emitVisiblePromos(): void {
     if (!this.map) return;
+    const el = this.mapContainer().nativeElement as HTMLElement;
+    if (el.offsetWidth === 0 || el.offsetHeight === 0) return;
     const bounds = this.map.getBounds();
     const visibleIds: number[] = [];
     this.markerMap.forEach((markers, promoId) => {

@@ -9,7 +9,7 @@ import {
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { tapResponse } from '@ngrx/operators';
-import { pipe, switchMap, tap, forkJoin } from 'rxjs';
+import { pipe, switchMap, tap, forkJoin, filter } from 'rxjs';
 import {
   Promocion,
   Categoria,
@@ -164,6 +164,7 @@ export const HomeStore = signalStore(
     ) => ({
       loadData: rxMethod<void>(
         pipe(
+          filter(() => !store.loading()),
           tap(() => patchState(store, { loading: true })),
           switchMap(() =>
             forkJoin({
