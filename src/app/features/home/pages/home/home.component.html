@@ -16,8 +16,17 @@
     <app-home-navbar />
 
     @if (store.loading()) {
-      <div class="flex items-center justify-center h-64">
-        <p-progressSpinner strokeWidth="3" styleClass="w-12 h-12" />
+      <div class="flex flex-col items-center justify-center h-[calc(100vh-4rem)]">
+        <div class="flex flex-col items-center gap-5">
+          <div class="animate-pulse">
+            <app-logo size="lg" />
+          </div>
+          <div class="flex gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#E8372C] animate-bounce [animation-delay:0ms]"></span>
+            <span class="w-2 h-2 rounded-full bg-[#E8372C] animate-bounce [animation-delay:150ms]"></span>
+            <span class="w-2 h-2 rounded-full bg-[#E8372C] animate-bounce [animation-delay:300ms]"></span>
+          </div>
+        </div>
       </div>
     } @else {
 

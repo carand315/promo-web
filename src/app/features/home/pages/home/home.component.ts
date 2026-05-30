@@ -9,7 +9,6 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SeoService } from '@core/services/seo.service';
 import { InputTextModule } from 'primeng/inputtext';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SliderModule } from 'primeng/slider';
 import { CategoriaNavbarComponent } from '../../components/categoria-navbar/categoria-navbar.component';
 import { CiudadBienvenidaModalComponent } from '../../components/ciudad-bienvenida-modal/ciudad-bienvenida-modal.component';
@@ -20,6 +19,7 @@ import { PromoMapComponent } from '../../components/promo-map/promo-map.componen
 import { HomeStore } from '../../home.store';
 import { SidebarService } from '../../services/sidebar.service';
 import { FooterComponent } from '@core/components/footer/footer.component';
+import { LogoComponent } from '@core/components/logo/logo.component';
 
 @Component({
   selector: 'app-home',
@@ -28,7 +28,6 @@ import { FooterComponent } from '@core/components/footer/footer.component';
     FormsModule,
     SliderModule,
     InputTextModule,
-    ProgressSpinnerModule,
     NavbarComponent,
     PromoCarouselComponent,
     PromoCardComponent,
@@ -36,6 +35,7 @@ import { FooterComponent } from '@core/components/footer/footer.component';
     CategoriaNavbarComponent,
     CiudadBienvenidaModalComponent,
     FooterComponent,
+    LogoComponent,
   ],
   templateUrl: './home.component.html',
 })
