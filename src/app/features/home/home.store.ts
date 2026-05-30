@@ -37,7 +37,7 @@ function resolveCiudadInicial(ciudades: Ciudad[], isBrowser: boolean): number | 
     }
   }
   return (
-    ciudades.find((c) => c.nombre.toLowerCase().startsWith('bogot'))?.id ??
+    ciudades.find((c) => c.nombre.toLowerCase().startsWith('medell'))?.id ??
     ciudades[0]?.id ??
     null
   );
