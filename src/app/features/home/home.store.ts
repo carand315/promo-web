@@ -25,7 +25,11 @@ const LS_KEY = 'buenplan_ciudad_seleccionada';
 
 function isActiva(fechaHasta: string | null): boolean {
   if (!fechaHasta) return true;
-  return new Date(fechaHasta) >= new Date();
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const hasta = new Date(fechaHasta);
+  hasta.setHours(0, 0, 0, 0);
+  return hasta >= hoy;
 }
 
 function resolveCiudadInicial(ciudades: Ciudad[], isBrowser: boolean): number | null {
