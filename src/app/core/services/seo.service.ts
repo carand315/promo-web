@@ -15,6 +15,7 @@ export interface SeoConfig {
   description: string;
   image?: string;
   type?: 'website' | 'article';
+  noindex?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -25,7 +26,9 @@ export class SeoService {
   private router = inject(Router);
 
   private get currentUrl(): string {
-    return `${BASE_URL}${this.router.url}`;
+    const path = this.router.url.split('?')[0];
+    const normalized = path !== '/' && path.endsWith('/') ? path.slice(0, -1) : path;
+    return `${BASE_URL}${normalized}`;
   }
 
   setPage(config: SeoConfig): void {
@@ -38,7 +41,7 @@ export class SeoService {
     this.titleService.setTitle(fullTitle);
 
     this.meta.updateTag({ name: 'description', content: description });
-    this.meta.updateTag({ name: 'robots', content: 'index, follow' });
+    this.meta.updateTag({ name: 'robots', content: config.noindex ? 'noindex, nofollow' : 'index, follow' });
 
     // Open Graph
     this.meta.updateTag({ property: 'og:title', content: fullTitle });
@@ -76,19 +79,45 @@ export class SeoService {
       type: 'article',
     });
 
+    if (promo.fechaDesde) {
+      this.meta.updateTag({ property: 'article:published_time', content: promo.fechaDesde });
+    }
+    if (promo.fechaHasta) {
+      this.meta.updateTag({ property: 'article:modified_time', content: promo.fechaHasta });
+    }
+    this.meta.updateTag({ property: 'article:section', content: categoria });
+
+    const ahora = Date.now();
+    const estaActiva =
+      (!promo.fechaDesde || new Date(promo.fechaDesde).getTime() <= ahora) &&
+      (!promo.fechaHasta || new Date(promo.fechaHasta).getTime() >= ahora);
+
     this.setJsonLd({
       '@context': 'https://schema.org',
       '@type': 'Offer',
       name: promo.titulo,
       description,
       url: this.currentUrl,
+      availability: estaActiva
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
       seller: {
         '@type': 'LocalBusiness',
         name: promo.marca,
         address: { '@type': 'PostalAddress', addressLocality: ciudad, addressCountry: 'CO' },
       },
+      ...(ciudad && {
+        areaServed: { '@type': 'City', name: ciudad, addressCountry: 'CO' },
+      }),
       category: categoria,
       discount: `${promo.descuento}%`,
+      ...(tieneDescuento && {
+        priceSpecification: {
+          '@type': 'PriceSpecification',
+          priceCurrency: 'COP',
+          discount: promo.descuento,
+        },
+      }),
       ...(promo.fechaDesde && { validFrom: promo.fechaDesde }),
       ...(promo.fechaHasta && { validThrough: promo.fechaHasta }),
       ...(promo.imagenUrl && { image: promo.imagenUrl }),
