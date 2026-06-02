@@ -3,14 +3,10 @@ import {
   Component,
   inject,
   OnInit,
-  PLATFORM_ID,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { fromEvent } from 'rxjs';
-import { filter } from 'rxjs/operators';
 import { SeoService } from '@core/services/seo.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { SliderModule } from 'primeng/slider';
@@ -48,7 +44,6 @@ export class HomeComponent implements OnInit {
   sidebar = inject(SidebarService);
   private route = inject(ActivatedRoute);
   private seo = inject(SeoService);
-  private platformId = inject(PLATFORM_ID);
 
   constructor() {
     this.route.paramMap
@@ -58,16 +53,6 @@ export class HomeComponent implements OnInit {
         this.store.setCategoriaBySlug(slug);
         this.updateSeo(slug);
       });
-
-    // Re-fetch cuando el usuario vuelve a la pestaña/app (crítico en móviles)
-    if (isPlatformBrowser(this.platformId)) {
-      fromEvent(document, 'visibilitychange')
-        .pipe(
-          takeUntilDestroyed(),
-          filter(() => document.visibilityState === 'visible')
-        )
-        .subscribe(() => this.store.loadData());
-    }
   }
 
   ngOnInit(): void {
