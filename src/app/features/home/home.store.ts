@@ -53,6 +53,7 @@ interface HomeState {
   ciudades: Ciudad[];
   ciudadId: number | null;
   loading: boolean;
+  loaded: boolean;
   searchText: string;
   categoriaFiltroId: number | null;
   slugFiltroCategoria: string | null;
@@ -67,6 +68,7 @@ const initialState: HomeState = {
   ciudades: [],
   ciudadId: null,
   loading: true,
+  loaded: false,
   searchText: '',
   categoriaFiltroId: null,
   slugFiltroCategoria: null,
@@ -192,6 +194,7 @@ export const HomeStore = signalStore(
                     ciudadId,
                     categoriaFiltroId,
                     loading: false,
+                    loaded: true,
                     mostrarModalCiudad: primeraVisita,
                   });
                 },
