@@ -139,7 +139,7 @@ export class PromoDetalleComponent implements OnInit, OnDestroy {
                 fill="white" font-size="10"
             >★</text>`;
 
-    markers.forEach((m) => {
+    const leafletMarkers: LType.Marker[] = markers.map((m) => {
       const icon = L.divIcon({
         className: '',
         html: `
@@ -153,8 +153,13 @@ export class PromoDetalleComponent implements OnInit, OnDestroy {
         iconSize: [48, 62],
         iconAnchor: [24, 62],
       });
-      L.marker([m.lat, m.lng], { icon }).addTo(this.map!);
+      return L.marker([m.lat, m.lng], { icon }).addTo(this.map!);
     });
+
+    if (leafletMarkers.length > 1) {
+      const group = L.featureGroup(leafletMarkers);
+      this.map!.fitBounds(group.getBounds(), { padding: [48, 48] });
+    }
 
     setTimeout(() => this.map?.invalidateSize(), 200);
   }
