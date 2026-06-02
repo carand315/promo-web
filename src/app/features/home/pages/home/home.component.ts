@@ -2,8 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  OnDestroy,
   OnInit,
+  PLATFORM_ID,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -39,11 +42,18 @@ import { LogoComponent } from '@core/components/logo/logo.component';
   ],
   templateUrl: './home.component.html',
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   store = inject(HomeStore);
   sidebar = inject(SidebarService);
   private route = inject(ActivatedRoute);
   private seo = inject(SeoService);
+  private platformId = inject(PLATFORM_ID);
+
+  private onVisibilityChange = (): void => {
+    if (document.visibilityState === 'visible') {
+      this.store.loadData();
+    }
+  };
 
   constructor() {
     this.route.paramMap
@@ -58,6 +68,16 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     if (!this.store.loaded()) {
       this.store.loadData();
+    }
+
+    if (isPlatformBrowser(this.platformId)) {
+      document.addEventListener('visibilitychange', this.onVisibilityChange);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      document.removeEventListener('visibilitychange', this.onVisibilityChange);
     }
   }
 
