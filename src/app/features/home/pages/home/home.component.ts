@@ -103,11 +103,11 @@ export class HomeComponent implements OnInit, OnDestroy {
         '@context': 'https://schema.org',
         '@type': 'WebSite',
         name: 'Buen Plan',
-        url: 'https://buenplan.com.co',
+        url: 'https://unbuenplan.com.co',
         description: 'Plataforma de planes y descuentos en Colombia.',
         potentialAction: {
           '@type': 'SearchAction',
-          target: { '@type': 'EntryPoint', urlTemplate: 'https://buenplan.com.co/?q={search_term_string}' },
+          target: { '@type': 'EntryPoint', urlTemplate: 'https://unbuenplan.com.co/?q={search_term_string}' },
           'query-input': 'required name=search_term_string',
         },
       });

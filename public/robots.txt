@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://buenplan.com.co/sitemap.xml
+Sitemap: https://unbuenplan.com.co/sitemap.xml

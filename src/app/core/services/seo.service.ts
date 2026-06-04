@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Promocion } from '../../features/admin/promociones/models/promocion.model';
 
 const SITE_NAME = 'Buen Plan';
-const BASE_URL = 'https://buenplan.com.co';
+const BASE_URL = 'https://unbuenplan.com.co';
 const DEFAULT_IMAGE = `${BASE_URL}/og-default.jpg`;
 const DEFAULT_DESCRIPTION =
   'Encuentra los mejores planes y descuentos en restaurantes, ropa, tecnología, belleza y más en tu ciudad.';
