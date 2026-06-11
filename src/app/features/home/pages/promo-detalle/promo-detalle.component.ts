@@ -19,6 +19,7 @@ import { PromocionService } from '../../../admin/promociones/services/promocion.
 import { HomeStore } from '../../home.store';
 import { Promocion, MarkerData, DIAS_SEMANA } from '../../../admin/promociones/models/promocion.model';
 import { idFromSlug, promoSlug, ciudadToSlug } from '../../utils/slug.utils';
+import { buildMarkerIcon } from '../../utils/map-icon.utils';
 import { VisitasService } from '../../services/visitas.service';
 import { SeoService } from '@core/services/seo.service';
 import { LogoComponent } from '@core/components/logo/logo.component';
@@ -131,29 +132,8 @@ export class PromoDetalleComponent implements OnInit, OnDestroy {
       }
     ).addTo(this.map);
 
-    const innerContent = promo.descuento > 0
-      ? `<text x="14" y="14" text-anchor="middle" dominant-baseline="central"
-                fill="white" font-weight="800" font-size="8"
-                font-family="'Bricolage Grotesque','Inter',system-ui,sans-serif"
-            >${promo.descuento}%</text>`
-      : `<text x="14" y="15" text-anchor="middle" dominant-baseline="central"
-                fill="white" font-size="10"
-            >★</text>`;
-
     const leafletMarkers: LType.Marker[] = markers.map((m) => {
-      const icon = L.divIcon({
-        className: '',
-        html: `
-          <div style="filter:drop-shadow(0 4px 10px rgba(0,0,0,.32))">
-            <svg width="48" height="62" viewBox="0 0 28 36" overflow="visible" xmlns="http://www.w3.org/2000/svg">
-              <path d="M14 0C6.268 0 0 6.268 0 14c0 9.333 14 22 14 22S28 23.333 28 14C28 6.268 21.732 0 14 0z"
-                    fill="#E8372C" stroke="white" stroke-width="1.75"/>
-              ${innerContent}
-            </svg>
-          </div>`,
-        iconSize: [48, 62],
-        iconAnchor: [24, 62],
-      });
+      const icon = buildMarkerIcon(L, promo);
       return L.marker([m.lat, m.lng], { icon }).addTo(this.map!);
     });
 

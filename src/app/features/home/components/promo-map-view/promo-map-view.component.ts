@@ -12,60 +12,12 @@ import {
 import type * as LType from 'leaflet';
 import { MarkerData, Promocion } from '../../../admin/promociones/models/promocion.model';
 import { promoSlug } from '../../utils/slug.utils';
+import { buildMarkerIcon } from '../../utils/map-icon.utils';
 
-// Color del badge según descuento
 function markerColor(descuento: number): string {
   if (descuento >= 50) return '#E8372C';
   if (descuento >= 30) return '#F97316';
   return '#22C55E';
-}
-
-function buildIcon(L: typeof LType, promo: Promocion, selected: boolean): LType.DivIcon {
-  const color  = markerColor(promo.descuento);
-  const w      = selected ? 60 : 48;
-  const h      = selected ? 78 : 62;
-  const sw     = (3 * 28 / w).toFixed(2);
-  const fs     = selected ? 7.5 : 8;
-  const shadow = selected
-    ? 'drop-shadow(0 6px 16px rgba(0,0,0,.45))'
-    : 'drop-shadow(0 4px 10px rgba(0,0,0,.32))';
-
-  // Cuando no hay descuento: mostrar estrella en lugar del porcentaje
-  const innerContent = promo.descuento > 0
-    ? `<text x="14" y="14" text-anchor="middle" dominant-baseline="central"
-            fill="white" font-weight="800" font-size="${fs}"
-            font-family="'Bricolage Grotesque','Inter',system-ui,sans-serif"
-      >${promo.descuento}%</text>`
-    : `<text x="14" y="15" text-anchor="middle" dominant-baseline="central"
-            fill="white" font-size="${selected ? 11 : 10}"
-      >★</text>`;
-
-  const svg = `
-    <svg width="${w}" height="${h}" viewBox="0 0 28 36" overflow="visible" xmlns="http://www.w3.org/2000/svg">
-      <path d="M14 0C6.268 0 0 6.268 0 14c0 9.333 14 22 14 22S28 23.333 28 14C28 6.268 21.732 0 14 0z"
-            fill="${color}" stroke="white" stroke-width="${sw}"/>
-      ${innerContent}
-    </svg>`;
-
-  if (selected) {
-    return L.divIcon({
-      className: '',
-      html: `
-        <div style="position:relative;width:${w}px;height:${h}px;">
-          <div class="dh-pin-pulse" style="background:${color};"></div>
-          <div class="dh-pin-bounce" style="filter:${shadow};">${svg}</div>
-        </div>`,
-      iconSize:   [w, h],
-      iconAnchor: [w / 2, h],
-    });
-  }
-
-  return L.divIcon({
-    className: '',
-    html: `<div style="filter:${shadow}">${svg}</div>`,
-    iconSize:   [w, h],
-    iconAnchor: [w / 2, h],
-  });
 }
 
 // Colombia: centro aprox. y zoom inicial
@@ -309,9 +261,13 @@ export class PromoMapViewComponent implements OnDestroy {
       const markers: LType.Marker[] = [];
 
       coords.forEach(({ lat, lng }) => {
-        const marker = L.marker([lat, lng], { icon: buildIcon(L, promo, isSelected) });
-
         const color = markerColor(promo.descuento);
+        const w = isSelected ? 60 : 48;
+        const h = isSelected ? 78 : 62;
+        const marker = L.marker([lat, lng], {
+          icon: buildMarkerIcon(L, promo, { selected: isSelected, color, w, h }),
+        });
+
         const detalleUrl = `/promociones/colombia/${promoSlug(promo)}`;
         const popupHtml = `
           <div style="font-family:'Inter',system-ui,sans-serif;">
