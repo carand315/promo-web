@@ -10,11 +10,12 @@ import { Router } from '@angular/router';
 import { Promocion } from '../../../admin/promociones/models/promocion.model';
 import { HomeStore } from '../../home.store';
 import { promoSlug, ciudadToSlug } from '../../utils/slug.utils';
+import { LogoAvatarComponent } from '@shared/components/logo-avatar/logo-avatar.component';
 
 @Component({
   selector: 'app-promo-card',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, LowerCasePipe],
+  imports: [DatePipe, LowerCasePipe, LogoAvatarComponent],
   templateUrl: './promo-card.component.html',
 })
 export class PromoCardComponent {

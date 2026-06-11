@@ -25,12 +25,15 @@
       </div>
     }
 
-    <!-- Label categoría (top left) -->
-    @if (categoriaNombre()) {
-      <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full">
-        {{ categoriaNombre() }}
-      </span>
-    }
+    <!-- Logo anunciante (top left) -->
+    <div class="absolute top-3 left-3 ring-2 ring-white/80 rounded-full shadow-sm">
+      <app-logo-avatar
+        [logoUrl]="promo().logoUrl"
+        [marca]="promo().marca"
+        [color]="promo().colorMarca"
+        [size]="40"
+      />
+    </div>
 
     <!-- Badge destacada (top right) -->
     @if (promo().destacada) {

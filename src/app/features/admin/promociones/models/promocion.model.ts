@@ -8,6 +8,7 @@ export interface Promocion {
   destacada: boolean;
   colorMarca: string;
   imagenUrl: string;
+  logoUrl?: string;
   vigenciaDias: number; // bitmask: 1=Lun,2=Mar,4=Mié,8=Jue,16=Vie,32=Sáb,64=Dom
   fechaDesde: string | null;
   fechaHasta: string | null;
@@ -30,6 +31,7 @@ export interface CrearPromocionRequest {
   destacada: boolean;
   colorMarca: string;
   imagenUrl: string;
+  logoUrl?: string;
   vigenciaDias: number;
   fechaDesde: string | null;
   fechaHasta: string | null;
@@ -51,6 +53,7 @@ export interface ActualizarPromocionRequest {
   destacada: boolean;
   colorMarca: string;
   imagenUrl: string;
+  logoUrl?: string;
   vigenciaDias: number;
   fechaDesde: string | null;
   fechaHasta: string | null;

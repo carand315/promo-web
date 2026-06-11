@@ -138,6 +138,57 @@
         </div>
       </div>
 
+      <!-- Logo del anunciante -->
+      <div class="flex flex-col gap-2 mb-4">
+        <label class="text-sm font-medium text-gray-700">
+          Logo del anunciante
+          <span class="ml-1 text-xs font-normal text-gray-400">(opcional)</span>
+        </label>
+
+        <div class="flex items-center gap-4">
+          <!-- Preview circular -->
+          <app-logo-avatar
+            [logoUrl]="form.get('logoUrl')?.value"
+            [marca]="form.get('marca')?.value || 'M'"
+            [color]="form.get('colorMarca')?.value"
+            [size]="56"
+          />
+
+          <div class="flex flex-col gap-1.5">
+            @if (uploadingLogo()) {
+              <div class="flex items-center gap-2 text-sm text-gray-500">
+                <p-progressSpinner styleClass="w-5 h-5" />
+                Subiendo logo...
+              </div>
+            } @else {
+              <label
+                class="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-gray-300 bg-white text-sm text-gray-700 cursor-pointer hover:bg-gray-50 transition-colors"
+              >
+                <i class="pi pi-upload text-sm"></i>
+                {{ form.get('logoUrl')?.value ? 'Cambiar logo' : 'Subir logo' }}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  class="hidden"
+                  (change)="onLogoSelect($event)"
+                  aria-label="Seleccionar logo del anunciante"
+                />
+              </label>
+              @if (form.get('logoUrl')?.value) {
+                <button
+                  type="button"
+                  class="text-xs text-red-500 hover:text-red-700 text-left"
+                  (click)="form.get('logoUrl')!.setValue(null)"
+                >
+                  Eliminar logo
+                </button>
+              }
+            }
+            <small class="text-gray-400">Circular. Sin logo se usa la inicial de la marca.</small>
+          </div>
+        </div>
+      </div>
+
       <!-- Imagen -->
       <div class="flex flex-col gap-2 mb-4">
         <label class="text-sm font-medium text-gray-700">Imagen del plan</label>

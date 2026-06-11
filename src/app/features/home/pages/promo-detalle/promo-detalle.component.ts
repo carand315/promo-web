@@ -23,11 +23,12 @@ import { VisitasService } from '../../services/visitas.service';
 import { SeoService } from '@core/services/seo.service';
 import { LogoComponent } from '@core/components/logo/logo.component';
 import { FooterComponent } from '@core/components/footer/footer.component';
+import { LogoAvatarComponent } from '@shared/components/logo-avatar/logo-avatar.component';
 
 @Component({
   selector: 'app-promo-detalle',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, LowerCasePipe, LogoComponent, FooterComponent],
+  imports: [DatePipe, LowerCasePipe, LogoComponent, FooterComponent, LogoAvatarComponent],
   templateUrl: './promo-detalle.component.html',
 })
 export class PromoDetalleComponent implements OnInit, OnDestroy {

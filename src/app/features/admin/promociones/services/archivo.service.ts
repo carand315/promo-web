@@ -16,4 +16,12 @@ export class ArchivoService {
       .post<{ url: string }>(this.apiUrl, formData)
       .pipe(map((res) => res.url));
   }
+
+  uploadLogo(file: File): Observable<string> {
+    const formData = new FormData();
+    formData.append('archivo', file);
+    return this.http
+      .post<{ url: string }>(`${this.apiUrl}/logos`, formData)
+      .pipe(map((res) => res.url));
+  }
 }

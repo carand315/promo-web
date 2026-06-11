@@ -40,6 +40,7 @@ import {
 } from '../../models/promocion.model';
 import { PromocionService } from '../../services/promocion.service';
 import { ArchivoService } from '../../services/archivo.service';
+import { LogoAvatarComponent } from '@shared/components/logo-avatar/logo-avatar.component';
 
 const COLORES_MARCA = [
   '#EF4444', '#F97316', '#EAB308', '#22C55E',
@@ -63,6 +64,7 @@ const COLORES_MARCA = [
     CheckboxModule,
     ProgressSpinnerModule,
     TooltipModule,
+    LogoAvatarComponent,
   ],
   templateUrl: './promocion-form.component.html',
 })
@@ -80,6 +82,7 @@ export class PromocionFormComponent implements OnInit, OnDestroy {
 
   form!: FormGroup;
   uploading = signal(false);
+  uploadingLogo = signal(false);
   saving = signal(false);
   coloresMarca = COLORES_MARCA;
   diasSemana = DIAS_SEMANA;
@@ -116,6 +119,7 @@ export class PromocionFormComponent implements OnInit, OnDestroy {
       destacada: [p?.destacada ?? false],
       colorMarca: [p?.colorMarca ?? COLORES_MARCA[5]],
       imagenUrl: [p?.imagenUrl ?? ''],
+      logoUrl: [p?.logoUrl ?? null],
       vigenciaDias: [p?.vigenciaDias ?? 127],
       fechaDesde: [p?.fechaDesde ? new Date(p.fechaDesde) : null],
       fechaHasta: [p?.fechaHasta ? new Date(p.fechaHasta) : null],
@@ -224,6 +228,24 @@ export class PromocionFormComponent implements OnInit, OnDestroy {
     });
   }
 
+  onLogoSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.uploadingLogo.set(true);
+    this.archivoService.uploadLogo(file).subscribe({
+      next: (url) => {
+        this.form.get('logoUrl')!.setValue(url);
+        this.uploadingLogo.set(false);
+        input.value = '';
+      },
+      error: () => {
+        this.uploadingLogo.set(false);
+        input.value = '';
+      },
+    });
+  }
+
   guardar(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -245,6 +267,7 @@ export class PromocionFormComponent implements OnInit, OnDestroy {
         destacada: val.destacada,
         colorMarca: val.colorMarca,
         imagenUrl: val.imagenUrl,
+        logoUrl: val.logoUrl || undefined,
         vigenciaDias: val.vigenciaDias,
         fechaDesde: this.toIso(val.fechaDesde),
         fechaHasta: this.toIso(val.fechaHasta),
@@ -272,6 +295,7 @@ export class PromocionFormComponent implements OnInit, OnDestroy {
         destacada: val.destacada,
         colorMarca: val.colorMarca,
         imagenUrl: val.imagenUrl,
+        logoUrl: val.logoUrl || undefined,
         vigenciaDias: val.vigenciaDias,
         fechaDesde: this.toIso(val.fechaDesde),
         fechaHasta: this.toIso(val.fechaHasta),
