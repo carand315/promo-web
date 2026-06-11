@@ -9,6 +9,45 @@ export interface MarkerIconOptions {
   popupAnchor?: [number, number];
 }
 
+function ensureLogoMarkerStyles(): void {
+  const ID = 'dh-logo-marker-styles';
+  if (document.getElementById(ID)) return;
+  const style = document.createElement('style');
+  style.id = ID;
+  style.textContent = `
+    @keyframes dh-radar {
+      0%   { transform: scale(1);   opacity: 0.75; }
+      100% { transform: scale(2.8); opacity: 0;    }
+    }
+    .dh-logo-marker {
+      position: relative;
+      display: inline-block;
+    }
+    .dh-logo-marker::before,
+    .dh-logo-marker::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.55);
+      animation: dh-radar 2s ease-out infinite;
+      pointer-events: none;
+    }
+    .dh-logo-marker::after {
+      animation-delay: 0.9s;
+    }
+    .dh-logo-circle {
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 3px rgba(255,255,255,0.95),
+        0 6px 20px rgba(0,0,0,0.55);
+      position: relative;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 /**
  * Construye un L.divIcon para un marcador de Leaflet.
  * Si la promo tiene logoUrl → muestra el logo circular dentro del pin.
@@ -25,25 +64,31 @@ export function buildMarkerIcon(
     : 'drop-shadow(0 4px 10px rgba(0,0,0,.32))';
 
   if (promo.logoUrl) {
+    ensureLogoMarkerStyles();
+
     // Círculo puro: tamaño cuadrado, ancla en el centro
     const d = opts.selected ? 52 : 40;
     const svgHtml = buildLogoSvg(promo, d);
 
     const iconOptions: LType.DivIconOptions = {
-      className:  '',
-      iconSize:   [d, d],
-      iconAnchor: [d / 2, d / 2],
+      className:   '',
+      iconSize:    [d, d],
+      iconAnchor:  [d / 2, d / 2],
       popupAnchor: opts.popupAnchor ?? [0, -(d / 2)],
     };
+
+    const logoInner = `<div class="dh-logo-circle">${svgHtml}</div>`;
 
     if (opts.selected) {
       iconOptions.html = `
         <div style="position:relative;width:${d}px;height:${d}px;">
           <div class="dh-pin-pulse" style="background:${color};border-radius:50%;"></div>
-          <div class="dh-pin-bounce" style="filter:${shadow};">${svgHtml}</div>
+          <div class="dh-pin-bounce">
+            <div class="dh-logo-marker">${logoInner}</div>
+          </div>
         </div>`;
     } else {
-      iconOptions.html = `<div style="filter:${shadow}">${svgHtml}</div>`;
+      iconOptions.html = `<div class="dh-logo-marker">${logoInner}</div>`;
     }
 
     return L.divIcon(iconOptions);
