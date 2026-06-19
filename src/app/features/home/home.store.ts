@@ -22,6 +22,8 @@ import { toSlug } from './utils/slug.utils';
 import { CategoriaConConteo } from './home.model';
 
 const LS_KEY = 'buenplan_ciudad_seleccionada';
+const SS_SEARCH_KEY = 'buenplan_search';
+const SS_DESCUENTO_KEY = 'buenplan_descuento_min';
 
 function isActiva(fechaHasta: string | null): boolean {
   if (!fechaHasta) return true;
@@ -30,6 +32,22 @@ function isActiva(fechaHasta: string | null): boolean {
   const hasta = new Date(fechaHasta);
   hasta.setHours(0, 0, 0, 0);
   return hasta >= hoy;
+}
+
+function resolveSearchInicial(isBrowser: boolean): string {
+  if (isBrowser) return sessionStorage.getItem(SS_SEARCH_KEY) ?? '';
+  return '';
+}
+
+function resolveDescuentoInicial(isBrowser: boolean): number {
+  if (isBrowser) {
+    const saved = sessionStorage.getItem(SS_DESCUENTO_KEY);
+    if (saved !== null) {
+      const val = parseInt(saved, 10);
+      if (!isNaN(val)) return val;
+    }
+  }
+  return 0;
 }
 
 function resolveCiudadInicial(ciudades: Ciudad[], isBrowser: boolean): number | null {
@@ -193,6 +211,8 @@ export const HomeStore = signalStore(
                     ciudades,
                     ciudadId,
                     categoriaFiltroId,
+                    searchText: resolveSearchInicial(isBrowser),
+                    descuentoMin: resolveDescuentoInicial(isBrowser),
                     loading: false,
                     loaded: true,
                     mostrarModalCiudad: primeraVisita,
@@ -224,6 +244,9 @@ export const HomeStore = signalStore(
       },
 
       setSearch(searchText: string): void {
+        if (isPlatformBrowser(platformId)) {
+          sessionStorage.setItem(SS_SEARCH_KEY, searchText);
+        }
         patchState(store, { searchText });
       },
 
@@ -245,6 +268,9 @@ export const HomeStore = signalStore(
       },
 
       setDescuentoMin(descuentoMin: number): void {
+        if (isPlatformBrowser(platformId)) {
+          sessionStorage.setItem(SS_DESCUENTO_KEY, String(descuentoMin));
+        }
         patchState(store, { descuentoMin });
       },
 
