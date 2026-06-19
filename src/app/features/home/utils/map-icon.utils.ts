@@ -58,7 +58,7 @@ export function buildMarkerIcon(
   promo: Promocion,
   opts: MarkerIconOptions = {}
 ): LType.DivIcon {
-  const color  = opts.color ?? '#E8372C';
+  const color  = opts.color ?? '#e8342c';
   const shadow = opts.selected
     ? 'drop-shadow(0 6px 16px rgba(0,0,0,.45))'
     : 'drop-shadow(0 4px 10px rgba(0,0,0,.32))';

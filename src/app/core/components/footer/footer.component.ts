@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-footer',
@@ -9,4 +10,7 @@ import { RouterLink } from '@angular/router';
 })
 export class FooterComponent {
   readonly year = new Date().getFullYear();
+  readonly whatsappUrl =
+    `https://wa.me/${environment.whatsappPlataforma}` +
+    `?text=${encodeURIComponent('Hola, me interesa publicar mi negocio en Buen Plan')}`;
 }

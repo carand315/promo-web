@@ -59,8 +59,8 @@
       <button
         class="w-full py-3 rounded-xl text-sm font-bold text-white transition-all duration-200"
         [class]="ciudadLocal()
-          ? 'bg-[#E8372C] hover:bg-[#c62d22] shadow-lg shadow-red-900/40 cursor-pointer'
-          : 'bg-[#E8372C]/40 cursor-not-allowed'"
+          ? 'bg-brand-coral hover:bg-brand-coral-dark shadow-lg shadow-brand-tinto/40 cursor-pointer'
+          : 'bg-brand-coral/40 cursor-not-allowed'"
         [disabled]="!ciudadLocal()"
         (click)="confirmar()"
         aria-label="Ver planes en la ciudad seleccionada"

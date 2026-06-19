@@ -53,15 +53,11 @@ function parseMarkers(markers: string): MarkerData[] {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block h-full' },
   template: `
-    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden h-full flex flex-col">
-      <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <i class="pi pi-map-marker text-[#E8372C]"></i>
-          <span class="font-semibold text-gray-700 text-sm">Mapa de Planes</span>
-        </div>
-        <span class="text-xs text-gray-400">{{ ubicaciones() }} ubicaciones</span>
+    <div class="relative rounded-xl border border-gray-100 shadow-sm overflow-hidden h-full">
+      <div #mapContainer class="w-full h-full"></div>
+      <div class="absolute top-2 right-2 z-[500] bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 text-xs text-gray-600 font-medium shadow-sm pointer-events-none">
+        {{ ubicaciones() }} ubicaciones
       </div>
-      <div #mapContainer class="flex-1 min-h-0"></div>
     </div>
   `,
 })
@@ -178,7 +174,7 @@ export class PromoMapComponent implements OnDestroy {
               <p style="margin:0 0 8px;font-size:11px;color:#777;">${promo.marca}</p>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
                 ${promo.descuento > 0
-                  ? `<span style="background:#E8372C;color:white;font-weight:800;font-size:11px;
+                  ? `<span style="background:#e8342c;color:white;font-weight:800;font-size:11px;
                                   padding:2px 9px;border-radius:20px;display:inline-block;">
                        ${promo.descuento}% OFF
                      </span>`

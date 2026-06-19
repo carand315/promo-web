@@ -15,7 +15,7 @@ import { promoSlug } from '../../utils/slug.utils';
 import { buildMarkerIcon } from '../../utils/map-icon.utils';
 
 function markerColor(descuento: number): string {
-  if (descuento >= 50) return '#E8372C';
+  if (descuento >= 50) return '#e8342c';
   if (descuento >= 30) return '#F97316';
   return '#22C55E';
 }
@@ -216,7 +216,7 @@ export class PromoMapViewComponent implements OnDestroy {
         showCoverageOnHover: false,
         iconCreateFunction: (cluster: LType.MarkerCluster) => {
           const count = cluster.getChildCount();
-          const color = count >= 10 ? '#E8372C' : count >= 5 ? '#F97316' : '#22C55E';
+          const color = count >= 10 ? '#e8342c' : count >= 5 ? '#F97316' : '#22C55E';
           return L.divIcon({
             className: '',
             html: `<div style="

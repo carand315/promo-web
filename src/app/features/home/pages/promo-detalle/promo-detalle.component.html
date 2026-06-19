@@ -1,7 +1,7 @@
-<div class="min-h-screen bg-[#F8F5F0]">
+<div class="min-h-screen bg-brand-crema">
 
   <!-- ── Barra superior ─────────────────────────────────────────────────── -->
-  <div class="bg-[#F8F5F0] border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3">
+  <div class="bg-brand-papel border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
 
       <!-- Breadcrumb + back -->
@@ -52,7 +52,7 @@
   <!-- ── Loading ────────────────────────────────────────────────────────── -->
   @if (loading()) {
     <div class="flex items-center justify-center h-96">
-      <div class="w-8 h-8 border-4 border-[#E8372C] border-t-transparent rounded-full animate-spin"></div>
+      <div class="w-8 h-8 border-4 border-brand-coral border-t-transparent rounded-full animate-spin"></div>
     </div>
   } @else if (promo()) {
 
@@ -67,7 +67,7 @@
           <!-- Descuento hero -->
           @if (promo()!.descuento > 0) {
             <div class="flex items-end gap-4 pb-5 border-b border-gray-100">
-              <span class="text-8xl font-black text-[#E8372C] leading-none tabular-nums">
+              <span class="text-8xl font-black text-brand-coral leading-none tabular-nums">
                 {{ promo()!.descuento }}%
               </span>
               <div class="pb-1">
@@ -80,13 +80,13 @@
           <!-- Tags chips -->
           <div class="flex flex-wrap items-center gap-2">
             @if (categoriaNombre()) {
-              <span class="inline-flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3 py-1 text-sm text-gray-600">
+              <span class="inline-flex items-center gap-1.5 bg-brand-papel border border-gray-200 rounded-full px-3 py-1 text-sm text-gray-600">
                 <i class="pi pi-tag text-xs text-gray-400"></i>
                 {{ categoriaNombre() }}
               </span>
             }
             @for (nombre of ciudadNombres(); track nombre) {
-              <span class="inline-flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3 py-1 text-sm text-gray-600">
+              <span class="inline-flex items-center gap-1.5 bg-brand-papel border border-gray-200 rounded-full px-3 py-1 text-sm text-gray-600">
                 <i class="pi pi-map-marker text-xs text-gray-400"></i>
                 {{ nombre }}
               </span>
@@ -176,7 +176,7 @@
 
             <button
               (click)="abrirComoLlegar()"
-              class="w-10 h-10 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-500 hover:border-gray-400 transition-colors"
+              class="w-10 h-10 rounded-full border border-gray-200 bg-brand-papel flex items-center justify-center text-gray-500 hover:border-gray-400 transition-colors"
               aria-label="Compartir"
             >
               <i class="pi pi-share-alt text-sm"></i>
@@ -185,15 +185,15 @@
 
           <!-- Mini stats — rellena el espacio inferior -->
           <div class="mt-auto grid grid-cols-3 gap-3 pt-5 border-t border-gray-100">
-            <div class="bg-white rounded-xl border border-gray-100 p-3 text-center">
+            <div class="bg-brand-papel rounded-xl border border-gray-100 p-3 text-center">
               <p class="text-2xl font-black text-gray-800">{{ diasRestantes() ?? '∞' }}</p>
               <p class="text-[10px] text-gray-400 font-semibold tracking-wider mt-0.5">DÍAS REST.</p>
             </div>
-            <div class="bg-white rounded-xl border border-gray-100 p-3 text-center">
+            <div class="bg-brand-papel rounded-xl border border-gray-100 p-3 text-center">
               <p class="text-2xl font-black text-gray-800">{{ diasPorSemana() }}</p>
               <p class="text-[10px] text-gray-400 font-semibold tracking-wider mt-0.5">DÍAS/SEM.</p>
             </div>
-            <div class="bg-white rounded-xl border border-gray-100 p-3 text-center">
+            <div class="bg-brand-papel rounded-xl border border-gray-100 p-3 text-center">
               @if (ciudadNombres().length > 1) {
                 <p class="text-2xl font-black text-gray-800">{{ ciudadNombres().length }}</p>
                 <p class="text-[10px] text-gray-400 font-semibold tracking-wider mt-0.5">CIUDADES</p>
@@ -208,7 +208,7 @@
 
         <!-- Col derecha: imagen hero — ocupa toda la altura de la col izquierda -->
         <div class="relative rounded-2xl overflow-hidden min-h-[480px]"
-          [style.background-color]="promo()!.colorMarca || '#1a1a1a'">
+          [style.background-color]="promo()!.colorMarca || '#180000'">
 
           @if (promo()!.imagenUrl) {
             <img
@@ -242,10 +242,10 @@
         <div class="lg:col-span-2 space-y-5">
 
           <!-- Sobre esta promoción -->
-          <div class="bg-white rounded-2xl border border-gray-100 p-6">
+          <div class="bg-brand-papel rounded-2xl border border-gray-100 p-6">
             <div class="flex items-center gap-2 mb-4">
-              <div class="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
-                <i class="pi pi-info-circle text-[#E8372C] text-xs"></i>
+              <div class="w-7 h-7 rounded-lg bg-brand-coral/10 flex items-center justify-center">
+                <i class="pi pi-info-circle text-brand-coral text-xs"></i>
               </div>
               <div>
                 <p class="font-semibold text-gray-800 text-sm">Sobre este plan</p>
@@ -277,10 +277,10 @@
 
           <!-- Vigencia -->
           @if (promo()!.fechaDesde || promo()!.fechaHasta) {
-            <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <div class="bg-brand-papel rounded-2xl border border-gray-100 p-6">
               <div class="flex items-center gap-2 mb-5">
-                <div class="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
-                  <i class="pi pi-calendar text-[#E8372C] text-xs"></i>
+                <div class="w-7 h-7 rounded-lg bg-brand-coral/10 flex items-center justify-center">
+                  <i class="pi pi-calendar text-brand-coral text-xs"></i>
                 </div>
                 <div>
                   <p class="font-semibold text-gray-800 text-sm">Vigencia</p>
@@ -302,7 +302,7 @@
                 }
                 <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    class="h-full bg-[#E8372C] rounded-full transition-all duration-500"
+                    class="h-full bg-brand-coral rounded-full transition-all duration-500"
                     [style.width]="progresoVigencia() + '%'"
                   ></div>
                 </div>
@@ -326,10 +326,10 @@
           }
 
           <!-- Días disponibles -->
-          <div class="bg-white rounded-2xl border border-gray-100 p-6">
+          <div class="bg-brand-papel rounded-2xl border border-gray-100 p-6">
             <div class="flex items-center gap-2 mb-5">
-              <div class="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
-                <i class="pi pi-clock text-[#E8372C] text-xs"></i>
+              <div class="w-7 h-7 rounded-lg bg-brand-coral/10 flex items-center justify-center">
+                <i class="pi pi-clock text-brand-coral text-xs"></i>
               </div>
               <div>
                 <p class="font-semibold text-gray-800 text-sm">Días disponibles</p>
@@ -342,7 +342,7 @@
                 <div
                   class="flex flex-col items-center gap-1.5 rounded-xl py-3 px-1 transition-all"
                   [class]="dia.activo
-                    ? 'bg-[#E8372C] text-white shadow-sm'
+                    ? 'bg-brand-coral text-white shadow-sm'
                     : 'bg-gray-50 text-gray-300'"
                   [attr.aria-label]="dia.nombre + (dia.activo ? ' disponible' : ' no disponible')"
                 >
@@ -350,7 +350,7 @@
                   <span class="text-lg font-black leading-none">{{ dia.fecha }}</span>
                   @if (dia.esHoy) {
                     <span class="w-1.5 h-1.5 rounded-full"
-                      [class]="dia.activo ? 'bg-white/70' : 'bg-[#E8372C]'">
+                      [class]="dia.activo ? 'bg-white/70' : 'bg-brand-coral'">
                     </span>
                   }
                 </div>
@@ -364,7 +364,7 @@
         <div class="space-y-5">
 
           <!-- Mapa -->
-          <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div class="bg-brand-papel rounded-2xl border border-gray-100 overflow-hidden">
             <div
               #mapContainer
               class="w-full"
@@ -386,7 +386,7 @@
                 </button>
                 <button
                   (click)="abrirWaze()"
-                  class="flex items-center justify-center gap-2 border border-gray-200 bg-white text-gray-700 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors"
+                  class="flex items-center justify-center gap-2 border border-gray-200 bg-brand-papel text-gray-700 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors"
                   [class.opacity-50]="!primerMarker()"
                   [disabled]="!primerMarker()"
                   aria-label="Abrir en Waze"
@@ -400,10 +400,10 @@
 
           <!-- Promos similares -->
           @if (similares().length > 0) {
-            <div class="bg-white rounded-2xl border border-gray-100 p-5">
+            <div class="bg-brand-papel rounded-2xl border border-gray-100 p-5">
               <div class="flex items-center gap-2 mb-4">
-                <div class="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
-                  <i class="pi pi-th-large text-[#E8372C] text-xs"></i>
+                <div class="w-7 h-7 rounded-lg bg-brand-coral/10 flex items-center justify-center">
+                  <i class="pi pi-th-large text-brand-coral text-xs"></i>
                 </div>
                 <div>
                   <p class="font-semibold text-gray-800 text-sm">Planes similares</p>
@@ -424,7 +424,7 @@
                         <img [src]="s.imagenUrl" [alt]="s.titulo" class="w-full h-full object-cover" />
                       } @else {
                         <div class="w-full h-full flex items-center justify-center text-white text-sm font-bold"
-                          [style.background-color]="s.colorMarca || '#E8372C'">
+                          [style.background-color]="s.colorMarca || '#e8342c'">
                           {{ s.marca.charAt(0) }}
                         </div>
                       }
@@ -437,7 +437,7 @@
                     </div>
                     <!-- Badge -->
                     @if (s.descuento > 0) {
-                      <span class="flex-shrink-0 text-sm font-bold text-[#E8372C]">
+                      <span class="flex-shrink-0 text-sm font-bold text-brand-coral">
                         –{{ s.descuento }}%
                       </span>
                     }

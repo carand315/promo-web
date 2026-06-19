@@ -20,7 +20,6 @@ import { PromoCardComponent } from '../../components/promo-card/promo-card.compo
 import { PromoCarouselComponent } from '../../components/promo-carousel/promo-carousel.component';
 import { PromoMapComponent } from '../../components/promo-map/promo-map.component';
 import { HomeStore } from '../../home.store';
-import { SidebarService } from '../../services/sidebar.service';
 import { FooterComponent } from '@core/components/footer/footer.component';
 import { LogoComponent } from '@core/components/logo/logo.component';
 
@@ -44,7 +43,6 @@ import { LogoComponent } from '@core/components/logo/logo.component';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   store = inject(HomeStore);
-  sidebar = inject(SidebarService);
   private route = inject(ActivatedRoute);
   private seo = inject(SeoService);
   private platformId = inject(PLATFORM_ID);

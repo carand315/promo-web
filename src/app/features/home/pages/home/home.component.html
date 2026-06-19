@@ -1,18 +1,8 @@
 <app-ciudad-bienvenida-modal />
 
-<div class="min-h-screen bg-[#f5f5f5]">
-
-  <!-- Sidebar de categorías (fijo, izquierda) -->
-  <app-categoria-navbar
-    [categorias]="store.categoriasConConteo()"
-    [categoriaActivaId]="store.categoriaFiltroId()"
-    [totalPromos]="store.totalPromosCiudad()"
-  />
-
-  <!-- Contenido principal — padding reactivo al sidebar -->
-  <div [class]="sidebar.collapsed() ? 'lg:pl-14' : 'lg:pl-60'" class="transition-[padding] duration-300">
-
-    <!-- Navbar -->
+<div class="min-h-screen bg-brand-crema">
+  <div class="w-full">
+    <!-- Navbar (sticky top-0, h-16) -->
     <app-home-navbar />
 
     @if (store.loading()) {
@@ -22,45 +12,62 @@
             <app-logo size="lg" />
           </div>
           <div class="flex gap-2">
-            <span class="w-2 h-2 rounded-full bg-[#E8372C] animate-bounce [animation-delay:0ms]"></span>
-            <span class="w-2 h-2 rounded-full bg-[#E8372C] animate-bounce [animation-delay:150ms]"></span>
-            <span class="w-2 h-2 rounded-full bg-[#E8372C] animate-bounce [animation-delay:300ms]"></span>
+            <span
+              class="w-2 h-2 rounded-full bg-brand-coral animate-bounce [animation-delay:0ms]"
+            ></span>
+            <span
+              class="w-2 h-2 rounded-full bg-brand-coral animate-bounce [animation-delay:150ms]"
+            ></span>
+            <span
+              class="w-2 h-2 rounded-full bg-brand-coral animate-bounce [animation-delay:300ms]"
+            ></span>
           </div>
         </div>
       </div>
     } @else {
+      <!-- ── Hero ──────────────────────────────────────────────────────────── -->
 
-      <!-- ── Hero: Carrusel + Mapa (solo en "Todas") ──────────────────────── -->
+      <!-- Mobile: carrusel full (solo sin filtro de categoría) -->
       @if (store.categoriaFiltroId() === null) {
-        <div class="grid grid-cols-1 md:grid-cols-[6fr_3fr] md:items-stretch">
-
-          <!-- Carrusel -->
-          <div class="overflow-hidden">
-            <app-promo-carousel [promos]="store.promoDestacadas()" />
-          </div>
-
-          <!-- Panel del mapa -->
-          <div class="flex flex-col h-56 md:h-full min-h-[300px]">
-            <app-promo-map
-              [promociones]="store.promosFiltradas()"
-              [ciudadNombre]="store.ciudadSeleccionada()?.nombre ?? ''"
-            />
-          </div>
-
+        <div class="lg:hidden w-full overflow-hidden">
+          <app-promo-carousel [promos]="store.promoDestacadas()" />
         </div>
       }
 
-      <!-- ── Barra de filtros ──────────────────────────────────────────────── -->
-      <div class="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sticky top-16 z-[999]">
-        <div class="flex flex-wrap gap-4 items-center">
+      <!-- Desktop: carrusel 65% + mapa 35% (siempre visible) -->
+      <div class="hidden lg:flex h-[420px] w-full overflow-hidden">
+        <div class="w-[65%] overflow-hidden flex-shrink-0">
+          <app-promo-carousel [promos]="store.promoDestacadas()" />
+        </div>
+        <div class="w-[35%] flex-shrink-0">
+          <app-promo-map
+            [promociones]="store.promosFiltradas()"
+            [ciudadNombre]="store.ciudadSeleccionada()?.nombre ?? ''"
+          />
+        </div>
+      </div>
 
+      <div class="my-5">
+        <app-categoria-navbar
+          [categorias]="store.categoriasConConteo()"
+          [categoriaActivaId]="store.categoriaFiltroId()"
+          [totalPromos]="store.totalPromosCiudad()"
+        />
+      </div>
+      <!-- ── Barra de categorías: pills desktop (sticky top-16) + drawer mobile ── -->
+
+      <!-- ── Barra de filtros (sticky top-28) ──────────────────────────────── -->
+      <div class="bg-white border-b border-gray-100 px-4 sm:px-6 py-3 sticky top-28 z-[999]">
+        <div class="flex flex-wrap gap-4 items-center">
           <div class="relative flex-1 min-w-48">
-            <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-sm"></i>
+            <i
+              class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-sm"
+            ></i>
             <input
               pInputText
               type="text"
               placeholder="Buscar plan o marca..."
-              class="w-full !pl-9 text-sm"
+              class="w-full !pl-9 !rounded-full !bg-gray-50 focus:!bg-white focus:!border-brand-coral text-sm transition-colors"
               [value]="store.searchText()"
               (input)="store.setSearch($any($event.target).value)"
               aria-label="Buscar planes"
@@ -73,96 +80,87 @@
               class="w-32"
               [ngModel]="store.descuentoMin()"
               (ngModelChange)="store.setDescuentoMin($event)"
-              [min]="0" [max]="100"
+              [min]="0"
+              [max]="100"
               aria-label="Descuento mínimo"
             />
-            <span class="text-sm font-bold text-[#E8372C] w-10 text-right">
+            <span class="text-sm font-bold text-brand-coral w-10 text-right">
               {{ store.descuentoMin() }}%
             </span>
           </div>
-
         </div>
       </div>
 
-      <!-- ── Promos ─────────────────────────────────────────────────────────── -->
-      <div class="flex items-start gap-0 px-4 sm:px-6 py-8" animate.enter="page-fade-up">
-
-        <!-- Cards -->
-        <div class="flex-1 min-w-0">
-
-          <div class="flex items-end justify-between mb-5">
-            <h2 class="text-2xl font-bold text-gray-800">
-              @if (store.categoriaActivaNombre(); as nombre) {
-                {{ nombre }} en {{ store.ciudadSeleccionada()?.nombre ?? 'tu ciudad' }}
-              } @else {
-                Planes en {{ store.ciudadSeleccionada()?.nombre ?? 'tu ciudad' }}
-              }
-            </h2>
-            <p class="text-sm text-gray-400">
-              {{ store.promosFiltradas().length }} plan{{ store.promosFiltradas().length !== 1 ? 'es' : '' }} encontrado{{ store.promosFiltradas().length !== 1 ? 's' : '' }}
-            </p>
-          </div>
-
-          @if (store.promosFiltradas().length === 0) {
-            <div class="flex flex-col items-center justify-center py-20 px-6 text-center" animate.enter="fade-in">
-              <!-- Ícono animado -->
-              <div class="relative mb-6">
-                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-red-100 to-red-50 flex items-center justify-center">
-                  <i class="pi pi-map-marker text-4xl text-[#E8372C]"></i>
-                </div>
-                <!-- Pulso -->
-                <span class="absolute inset-0 rounded-full bg-red-200 opacity-40 animate-ping"></span>
-              </div>
-
-              <!-- Mensaje principal -->
-              <h3 class="text-xl font-bold text-gray-800 mb-2" style="font-family:'Bricolage Grotesque',sans-serif">
-                ¡Muy pronto, los mejores planes para ti!
-              </h3>
-              <p class="text-sm text-gray-400 max-w-xs leading-relaxed mb-6">
-                Estamos trabajando para traerte ofertas increíbles
-                @if (store.ciudadSeleccionada()?.nombre; as ciudad) {
-                  en <span class="font-semibold text-gray-600">{{ ciudad }}</span>
-                }.
-                Vuelve pronto.
-              </p>
-
-              <!-- Sugerencia si hay filtros activos -->
-              @if (store.searchText() || store.descuentoMin() > 0 || store.categoriaFiltroId() !== null) {
-                <button
-                  class="flex items-center gap-2 text-sm font-semibold text-[#E8372C] border border-[#E8372C]/30 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-full transition-colors"
-                  (click)="clearFiltros()"
-                  aria-label="Limpiar filtros"
-                >
-                  <i class="pi pi-filter-slash text-xs"></i>
-                  Limpiar filtros
-                </button>
-              }
-            </div>
-          } @else {
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-              @for (promo of store.promosFiltradas(); track promo.id; let i = $index) {
-                <app-promo-card [promo]="promo" animate.enter="card-enter" [style.--delay]="i * 55 + 'ms'" />
-              }
-            </div>
-          }
-
+      <!-- ── Cards ──────────────────────────────────────────────────────────── -->
+      <div class="px-4 sm:px-6 py-5">
+        <div class="flex items-end justify-between mb-4">
+          <h2 class="text-xl font-bold text-gray-800">
+            @if (store.categoriaActivaNombre(); as nombre) {
+              {{ nombre }} en {{ store.ciudadSeleccionada()?.nombre ?? 'tu ciudad' }}
+            } @else {
+              Planes en {{ store.ciudadSeleccionada()?.nombre ?? 'tu ciudad' }}
+            }
+          </h2>
+          <p class="text-sm text-gray-400">
+            {{ store.promosFiltradas().length }} plan{{
+              store.promosFiltradas().length !== 1 ? 'es' : ''
+            }}
+            encontrado{{ store.promosFiltradas().length !== 1 ? 's' : '' }}
+          </p>
         </div>
 
-        <!-- Mapa lateral — solo en categoría activa, solo lg+ -->
-        @if (store.categoriaFiltroId() !== null) {
-          <div class="hidden lg:block w-[360px] xl:w-[460px] flex-shrink-0 sticky top-[8.5rem] ml-6" style="height: calc(100vh - 8.5rem)">
-            <app-promo-map
-              [promociones]="store.promosFiltradas()"
-              [ciudadNombre]="store.ciudadSeleccionada()?.nombre ?? ''"
-            />
+        @if (store.promosFiltradas().length === 0) {
+          <div class="flex flex-col items-center justify-center py-20 px-6 text-center">
+            <div class="relative mb-6">
+              <div
+                class="w-24 h-24 rounded-full bg-gradient-to-br from-brand-coral/10 to-brand-crema flex items-center justify-center"
+              >
+                <i class="pi pi-map-marker text-4xl text-brand-coral"></i>
+              </div>
+              <span
+                class="absolute inset-0 rounded-full bg-brand-coral/20 opacity-40 animate-ping"
+              ></span>
+            </div>
+            <h3
+              class="text-xl font-bold text-gray-800 mb-2"
+              style="font-family: 'Bricolage Grotesque', sans-serif"
+            >
+              ¡Muy pronto, los mejores planes para ti!
+            </h3>
+            <p class="text-sm text-gray-400 max-w-xs leading-relaxed mb-6">
+              Estamos trabajando para traerte ofertas increíbles
+              @if (store.ciudadSeleccionada()?.nombre; as ciudad) {
+                en <span class="font-semibold text-gray-600">{{ ciudad }}</span>
+              }
+              . Vuelve pronto.
+            </p>
+            @if (
+              store.searchText() || store.descuentoMin() > 0 || store.categoriaFiltroId() !== null
+            ) {
+              <button
+                class="flex items-center gap-2 text-sm font-semibold text-brand-coral border border-brand-coral/30 bg-brand-crema hover:bg-brand-coral/10 px-4 py-2 rounded-full transition-colors"
+                (click)="clearFiltros()"
+                aria-label="Limpiar filtros"
+              >
+                <i class="pi pi-filter-slash text-xs"></i>
+                Limpiar filtros
+              </button>
+            }
+          </div>
+        } @else {
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            @for (promo of store.promosFiltradas(); track promo.id; let i = $index) {
+              <app-promo-card
+                [promo]="promo"
+                animate.enter="card-enter"
+                [style.--delay]="i * 55 + 'ms'"
+              />
+            }
           </div>
         }
-
       </div>
-
     }
   </div>
-
 </div>
 
 <app-footer />

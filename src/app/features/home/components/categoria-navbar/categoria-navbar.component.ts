@@ -1,10 +1,13 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  afterNextRender,
   computed,
+  ElementRef,
   input,
   signal,
   inject,
+  viewChild,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,7 +18,6 @@ import { CategoriaConConteo } from '../../home.model';
 import { toSlug } from '../../utils/slug.utils';
 import { HomeStore } from '../../home.store';
 import { SidebarService } from '../../services/sidebar.service';
-import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-categoria-navbar',
@@ -24,9 +26,6 @@ import { environment } from '@environments/environment';
   templateUrl: './categoria-navbar.component.html',
 })
 export class CategoriaNavbarComponent {
-  readonly whatsappUrl =
-    `https://wa.me/${environment.whatsappPlataforma}` +
-    `?text=${encodeURIComponent('Hola, me interesa publicar mi negocio en Buen Plan')}`;
   categorias = input.required<CategoriaConConteo[]>();
   categoriaActivaId = input<number | null>(null);
   totalPromos = input(0);
@@ -34,12 +33,34 @@ export class CategoriaNavbarComponent {
   store = inject(HomeStore);
   sidebar = inject(SidebarService);
   drawerOpen = signal(false);
+  canScrollLeft = signal(false);
+  canScrollRight = signal(true);
+
+  private pillsScroll = viewChild<ElementRef<HTMLDivElement>>('pillsScroll');
 
   ciudadOptions = computed(() =>
     this.store.ciudades().map((c) => ({ label: c.nombre, value: c.id }))
   );
 
   private router = inject(Router);
+
+  constructor() {
+    afterNextRender(() => this.updateScrollState());
+  }
+
+  updateScrollState(): void {
+    const el = this.pillsScroll()?.nativeElement;
+    if (!el) return;
+    this.canScrollLeft.set(el.scrollLeft > 4);
+    this.canScrollRight.set(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }
+
+  scrollPills(dir: 'left' | 'right'): void {
+    const el = this.pillsScroll()?.nativeElement;
+    if (!el) return;
+    el.scrollBy({ left: dir === 'right' ? 300 : -300, behavior: 'smooth' });
+    setTimeout(() => this.updateScrollState(), 320);
+  }
 
   toggleCollapsed(): void {
     this.sidebar.toggle();

@@ -1,18 +1,18 @@
-<nav class="sticky top-0 z-[1000] bg-[#1a0000] border-b border-white/10">
+<nav class="sticky top-0 z-[1000] bg-white border-b border-gray-100 shadow-sm">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
 
     <!-- Logo + Nav -->
     <div class="flex items-center gap-6">
       <a routerLink="/" aria-label="Ir al inicio">
-        <app-logo variant="light" size="md" />
+        <app-logo variant="dark" size="sm" />
       </a>
 
       <nav class="hidden lg:flex items-center gap-1" aria-label="Navegación principal">
         <a
           routerLink="/"
-          routerLinkActive="text-white bg-white/10"
+          routerLinkActive="bg-gray-100 text-gray-900"
           [routerLinkActiveOptions]="{ exact: true }"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
           aria-label="Ir a inicio"
         >
           <i class="pi pi-home text-xs"></i>
@@ -20,8 +20,8 @@
         </a>
         <a
           routerLink="/mapa"
-          routerLinkActive="!bg-red-600 !text-white shadow-lg shadow-red-900/50"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-red-400 border border-red-500/40 bg-red-500/10 hover:bg-red-600 hover:text-white hover:border-red-600 hover:shadow-lg hover:shadow-red-900/50 transition-all duration-200"
+          routerLinkActive="!bg-brand-coral/10 !text-brand-coral !border-brand-coral/30"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-gray-600 border border-transparent hover:border-brand-coral/30 hover:bg-brand-coral/10 hover:text-brand-coral transition-all duration-200"
           aria-label="Ver mapa de planes"
         >
           <i class="pi pi-map-marker text-sm"></i>
@@ -36,42 +36,30 @@
       <!-- Botón Mapa — solo mobile -->
       <a
         routerLink="/mapa"
-        class="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-red-400 border border-red-500/40 bg-red-500/10 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all duration-200"
+        class="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-brand-coral border border-brand-coral/30 bg-brand-coral/5 hover:bg-brand-coral hover:text-white hover:border-brand-coral transition-all duration-200"
         aria-label="Ver mapa de planes"
       >
         <i class="pi pi-map-marker text-sm"></i>
         Mapa
       </a>
 
-      <!-- City selector — solo desktop -->
-      <div class="hidden lg:block">
-    <div class="city-picker-shell" aria-label="Selector de ciudad">
-      <!-- Pulsing glow ring -->
-      <span class="city-picker-glow" aria-hidden="true"></span>
-
-      <!-- Pin icon -->
-      <span class="city-picker-icon" aria-hidden="true">
-        <i class="pi pi-map-marker"></i>
-      </span>
-
-      <!-- Label -->
-      <span class="city-picker-label hidden sm:block">Planes en</span>
-
-      <!-- Select -->
-      <p-select
-        [options]="ciudadOptions()"
-        [ngModel]="store.ciudadId()"
-        (ngModelChange)="store.setCiudad($event)"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Tu ciudad"
-        [checkmark]="true"
-        scrollHeight="320px"
-        class="city-select"
-        panelStyleClass="city-panel"
-        aria-label="Seleccionar ciudad"
-      />
-    </div>
+      <!-- City picker — solo desktop -->
+      <div class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-brand-crema border border-gray-200 rounded-full hover:border-brand-coral/50 transition-colors">
+        <i class="pi pi-map-marker text-brand-coral text-xs flex-shrink-0"></i>
+        <span class="text-xs text-gray-500 font-medium whitespace-nowrap">Planes en</span>
+        <p-select
+          [options]="ciudadOptions()"
+          [ngModel]="store.ciudadId()"
+          (ngModelChange)="store.setCiudad($event)"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Tu ciudad"
+          [checkmark]="true"
+          scrollHeight="320px"
+          class="city-select-light"
+          panelStyleClass="city-panel"
+          aria-label="Seleccionar ciudad"
+        />
       </div>
 
     </div>

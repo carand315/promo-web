@@ -45,7 +45,7 @@ export class PromoCardCompactComponent {
 
   markerColor = computed(() => {
     const d = this.promo().descuento;
-    if (d >= 50) return '#E8372C';
+    if (d >= 50) return '#e8342c';
     if (d >= 30) return '#F97316';
     return '#22C55E';
   });

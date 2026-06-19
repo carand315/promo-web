@@ -1,37 +1,103 @@
-<!-- ── DESKTOP: panel fijo full-height ── -->
-<aside
-  class="hidden lg:flex flex-col fixed left-0 top-0 h-screen z-40 bg-white border-r border-gray-200 overflow-hidden transition-[width] duration-300"
-  [class]="sidebar.collapsed() ? 'w-14' : 'w-60'"
+<!-- ── DESKTOP: barra horizontal de pills ── -->
+<nav
+  class="hidden lg:block bg-white border-b border-gray-100 sticky top-16 z-[998]"
   aria-label="Categorías"
 >
-  <!-- Header alineado con la altura del navbar (h-16 = 64px) -->
-  <div
-    class="flex items-center justify-between px-4 h-16 flex-shrink-0 bg-[#1a0000] border-b border-white/10"
-  >
-    @if (!sidebar.collapsed()) {
-      <span class="text-xs font-bold uppercase tracking-[0.15em] text-white/50">Categorías</span>
+  <div class="relative flex items-center">
+
+    <!-- Flecha izquierda -->
+    @if (canScrollLeft()) {
+      <button
+        (click)="scrollPills('left')"
+        class="absolute left-0 z-10 h-full px-2 flex items-center bg-gradient-to-r from-white via-white/90 to-transparent text-gray-500 hover:text-brand-coral transition-colors"
+        aria-label="Categorías anteriores"
+      >
+        <i class="pi pi-chevron-left text-sm"></i>
+      </button>
     }
-    <button
-      class="ml-auto text-white/40 hover:text-white/80 p-1 rounded transition-colors"
-      (click)="toggleCollapsed()"
-      [attr.aria-label]="sidebar.collapsed() ? 'Expandir' : 'Colapsar'"
+
+    <!-- Scroll container -->
+    <div
+      #pillsScroll
+      class="flex items-center gap-2 px-4 sm:px-6 py-3 overflow-x-auto scrollbar-none scroll-smooth"
+      (scroll)="updateScrollState()"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200"
-        [class.rotate-180]="sidebar.collapsed()"
-        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-      </svg>
-    </button>
-  </div>
 
-  <!-- Lista de categorías (scrollable) -->
-  <div class="flex-1 overflow-y-auto">
-    <ng-container *ngTemplateOutlet="listaItems" />
-  </div>
+      <!-- "Todas" pill -->
+      <button
+        class="flex-shrink-0 flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 whitespace-nowrap"
+        [class]="esTodas()
+          ? 'border-transparent text-white -translate-y-0.5'
+          : 'bg-white border-gray-200 text-gray-600 shadow-sm hover:-translate-y-0.5 hover:shadow-md hover:border-brand-coral/40 hover:text-brand-coral'"
+        [style.background-color]="esTodas() ? '#e8342c' : null"
+        [style.box-shadow]="esTodas() ? '0 4px 14px rgba(232,52,44,0.35)' : null"
+        (click)="seleccionarTodas()"
+        aria-label="Ver todos los planes"
+      >
+        <span
+          class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+          [class]="esTodas() ? 'bg-white/20' : 'bg-brand-coral/10'"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg"
+            class="h-3 w-3 flex-shrink-0"
+            [class]="esTodas() ? 'text-white' : 'text-brand-coral'"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+          </svg>
+        </span>
+        <span>Todas</span>
+        <span
+          class="text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center"
+          [class]="esTodas() ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500'"
+        >{{ totalPromos() }}</span>
+      </button>
 
-  <!-- CTA al pie -->
-  <ng-container *ngTemplateOutlet="ctaBlock" />
-</aside>
+      <!-- Pills de categorías -->
+      @for (cat of categorias(); track cat.id) {
+        <button
+          class="flex-shrink-0 flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 whitespace-nowrap"
+          [class]="categoriaActivaId() === cat.id
+            ? 'border-transparent text-white -translate-y-0.5'
+            : 'bg-white border-gray-200 text-gray-600 shadow-sm hover:-translate-y-0.5 hover:shadow-md'"
+          [style.background-color]="categoriaActivaId() === cat.id ? (cat.colorHex ?? '#e8342c') : null"
+          [style.box-shadow]="categoriaActivaId() === cat.id ? ('0 4px 14px ' + chipBg(cat.colorHex, 0.4)) : null"
+          (click)="seleccionarCategoria(cat)"
+          [attr.aria-label]="'Ver planes de ' + cat.nombre"
+          [attr.aria-current]="categoriaActivaId() === cat.id ? 'page' : null"
+        >
+          <!-- Ícono con tint del color de categoría -->
+          <span
+            class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+            [style.background-color]="categoriaActivaId() === cat.id ? 'rgba(255,255,255,0.22)' : chipBg(cat.colorHex, 0.14)"
+          >
+            <span
+              class="material-symbols-outlined text-[12px] leading-none"
+              [style.color]="categoriaActivaId() === cat.id ? 'white' : (cat.colorHex ?? '#94a3b8')"
+            >{{ cat.icono }}</span>
+          </span>
+          <span>{{ cat.nombre }}</span>
+          <span
+            class="text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center"
+            [class]="categoriaActivaId() === cat.id ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500'"
+          >{{ cat.totalPromociones }}</span>
+        </button>
+      }
+
+    </div>
+
+    <!-- Flecha derecha -->
+    @if (canScrollRight()) {
+      <button
+        (click)="scrollPills('right')"
+        class="absolute right-0 z-10 h-full px-2 flex items-center bg-gradient-to-l from-white via-white/90 to-transparent text-gray-500 hover:text-brand-coral transition-colors"
+        aria-label="Más categorías"
+      >
+        <i class="pi pi-chevron-right text-sm"></i>
+      </button>
+    }
+
+  </div>
+</nav>
 
 <!-- ── MÓVIL: botón trigger + drawer ── -->
 <div class="lg:hidden">
@@ -44,18 +110,18 @@
       (click)="toggleDrawer()"
       aria-label="Abrir categorías"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E8372C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-brand-coral" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
       </svg>
       <span>Categorías</span>
       @if (categoriaActivaId() !== null) {
-        <span class="ml-auto w-2 h-2 rounded-full bg-[#E8372C]"></span>
+        <span class="ml-auto w-2 h-2 rounded-full bg-brand-coral"></span>
       }
     </button>
 
     <!-- City selector — estilo igual a Categorías -->
     <div class="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-xl border border-gray-200 shadow-sm">
-      <i class="pi pi-map-marker text-[#E8372C] text-sm"></i>
+      <i class="pi pi-map-marker text-brand-coral text-sm"></i>
       <p-select
         [options]="ciudadOptions()"
         [ngModel]="store.ciudadId()"
@@ -86,7 +152,7 @@
     style="width:260px"
     role="dialog" aria-label="Categorías"
   >
-    <div class="flex items-center justify-between px-4 h-16 bg-[#1a0000] border-b border-white/10 flex-shrink-0">
+    <div class="flex items-center justify-between px-4 h-16 bg-brand-tinto border-b border-white/10 flex-shrink-0">
       <span class="text-xs font-bold uppercase tracking-[0.15em] text-white/50">Categorías</span>
       <button class="text-white/40 hover:text-white/80 p-1 rounded" (click)="toggleDrawer()" aria-label="Cerrar">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -97,7 +163,6 @@
     <div class="flex-1 overflow-y-auto">
       <ng-container *ngTemplateOutlet="listaItems" />
     </div>
-    <ng-container *ngTemplateOutlet="ctaBlock" />
   </div>
 </div>
 
@@ -109,9 +174,9 @@
     <!-- Todas -->
     <li>
       <button
-        class="group w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors relative"
+        class="group w-full flex items-center gap-2.5 px-3 py-1.5 text-left transition-colors relative"
         [class]="esTodas()
-          ? 'text-[#E8372C] font-semibold bg-red-50 before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:bg-[#E8372C] before:rounded-r'
+          ? 'text-brand-coral font-semibold bg-brand-crema before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:bg-brand-coral before:rounded-r'
           : 'text-gray-600 hover:bg-gray-50'"
         (click)="seleccionarTodas()"
         aria-label="Ver todos los planes"
@@ -121,7 +186,7 @@
         <!-- Chip con animación -->
         <span class="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center
                      transition-transform duration-200 group-hover:scale-110"
-          [class]="esTodas() ? 'bg-[#E8372C]' : 'bg-slate-400'">
+          [class]="esTodas() ? 'bg-brand-coral' : 'bg-slate-400'">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white"
             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
@@ -130,7 +195,7 @@
         @if (!sidebar.collapsed()) {
           <span class="flex-1 text-sm truncate">Todas</span>
           <span class="flex-shrink-0 text-xs font-semibold px-1.5 py-0.5 rounded-full min-w-[1.5rem] text-center"
-            [class]="esTodas() ? 'bg-[#E8372C] text-white' : 'bg-gray-100 text-gray-500'">
+            [class]="esTodas() ? 'bg-brand-coral text-white' : 'bg-gray-100 text-gray-500'">
             {{ totalPromos() }}
           </span>
         }
@@ -141,9 +206,9 @@
     @for (cat of categorias(); track cat.id) {
       <li>
         <button
-          class="group w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors relative"
+          class="group w-full flex items-center gap-2.5 px-3 py-1.5 text-left transition-colors relative"
           [class]="categoriaActivaId() === cat.id
-            ? 'text-[#E8372C] font-semibold bg-red-50 before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:bg-[#E8372C] before:rounded-r'
+            ? 'text-brand-coral font-semibold bg-brand-crema before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:bg-brand-coral before:rounded-r'
             : 'text-gray-600 hover:bg-gray-50'"
           (click)="seleccionarCategoria(cat)"
           [attr.aria-label]="'Ver planes de ' + cat.nombre"
@@ -154,7 +219,7 @@
           <!-- Chip con animación -->
           <span class="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center
                        transition-transform duration-200 group-hover:scale-110"
-            [style.background-color]="categoriaActivaId() === cat.id ? '#E8372C' : (cat.colorHex ?? '#94a3b8')"
+            [style.background-color]="categoriaActivaId() === cat.id ? '#e8342c' : (cat.colorHex ?? '#94a3b8')"
           >
             <span class="material-symbols-outlined text-[17px] leading-none text-white">
               {{ cat.icono }}
@@ -163,7 +228,7 @@
           @if (!sidebar.collapsed()) {
             <span class="flex-1 text-sm truncate">{{ cat.nombre }}</span>
             <span class="flex-shrink-0 text-xs font-semibold px-1.5 py-0.5 rounded-full min-w-[1.5rem] text-center"
-              [class]="categoriaActivaId() === cat.id ? 'bg-[#E8372C] text-white' : 'bg-gray-100 text-gray-500'">
+              [class]="categoriaActivaId() === cat.id ? 'bg-brand-coral text-white' : 'bg-gray-100 text-gray-500'">
               {{ cat.totalPromociones }}
             </span>
           }
@@ -173,42 +238,3 @@
   </ul>
 </ng-template>
 
-<ng-template #ctaBlock>
-  @if (sidebar.collapsed()) {
-    <!-- Colapsado: ícono centrado -->
-    <div class="flex items-center justify-center py-3 border-t border-white/10 flex-shrink-0 bg-[#1a0000]">
-      <a
-        [href]="whatsappUrl"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="flex items-center justify-center w-9 h-9 rounded-lg bg-[#E8372C]/20 hover:bg-[#E8372C]/40 transition-colors"
-        aria-label="¿Tienes un negocio? Contáctanos por WhatsApp"
-      >
-        <span class="material-symbols-outlined text-[20px] text-[#E8372C]">storefront</span>
-      </a>
-    </div>
-  } @else {
-    <!-- Expandido: mini-card -->
-    <div class="relative overflow-hidden flex-shrink-0 bg-gradient-to-br from-[#1a0000] to-[#2d0808] px-4 py-4">
-      <!-- Círculos decorativos -->
-      <div class="absolute -top-5 -right-5 w-20 h-20 rounded-full bg-white/5 pointer-events-none"></div>
-      <div class="absolute bottom-1 right-2 w-12 h-12 rounded-full bg-[#E8372C]/10 pointer-events-none"></div>
-
-      <span class="material-symbols-outlined text-[30px] text-[#E8372C]">storefront</span>
-      <p class="mt-1.5 text-sm font-bold text-white leading-tight">¿Tienes un negocio?</p>
-      <p class="mt-0.5 text-[11px] text-white/50 leading-snug">Llega a más clientes<br>en tu ciudad</p>
-      <a
-        [href]="whatsappUrl"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="mt-3 flex items-center justify-center gap-1.5 w-full py-2 rounded-lg bg-[#E8372C] hover:bg-[#c42e22] active:scale-95 text-white text-xs font-semibold transition-all"
-        aria-label="Contáctanos por WhatsApp"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </svg>
-        WhatsApp
-      </a>
-    </div>
-  }
-</ng-template>
