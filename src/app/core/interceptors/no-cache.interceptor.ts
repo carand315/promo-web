@@ -8,6 +8,7 @@ import { environment } from '@environments/environment';
 export const noCacheInterceptor: HttpInterceptorFn = (req, next) => {
   if (req.method === 'GET' && req.url.startsWith(environment.apiUrl)) {
     req = req.clone({
+      params: req.params.set('_t', Date.now().toString()),
       setHeaders: {
         'Cache-Control': 'no-cache, no-store',
         Pragma: 'no-cache',
